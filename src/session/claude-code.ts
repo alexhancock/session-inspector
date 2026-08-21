@@ -3,12 +3,16 @@ import {
   BlockDraft,
   DraftStep,
   Fact,
+  RequestMark,
   Session,
   allocateTokens,
+  attributeInput,
+  contextOf,
   finalizeSteps,
   idleDraft,
   oneLine,
   spanBlocks,
+  sumRequests,
   sumTokens,
   toDraft,
   tokensOf,
@@ -66,6 +70,8 @@ export function parse(input: unknown, fileName: string): Session {
   })
 
   const drafts: DraftStep[] = []
+  const marks: RequestMark[] = []
+  const marked = new Set<string>()
   const pendingTools = new Map<string, DraftStep>()
   let cursor = startedAt
   let model = ''
@@ -86,7 +92,16 @@ export function parse(input: unknown, fileName: string): Session {
         j++
       }
       model = r.message?.model || model
-      spanBlocks(blocks, Math.min(cursor, at), groupEnd).forEach((span, k) => {
+      const groupStart = Math.min(cursor, at)
+      const key = String(msgId ?? r.uuid ?? i)
+      if (!marked.has(key)) {
+        marked.add(key)
+        const first = allocations.get(blocks[0]?.id ?? '')
+        if (first?.request) {
+          marks.push({ at: groupStart, context: contextOf(first.request), output: first.request.output })
+        }
+      }
+      spanBlocks(blocks, groupStart, groupEnd).forEach((span, k) => {
         const block = blocks[k]!
         const step = toDraft(block, span, allocations.get(block.id))
         drafts.push(step)
@@ -110,6 +125,7 @@ export function parse(input: unknown, fileName: string): Session {
           const wrote = step.end ?? step.start
           step.end = Math.max(wrote, at)
           step.isError = Boolean(b.is_error)
+          step.injectedChars = body.length
           step.fields.push({
             label: b.is_error ? 'Error' : 'Result',
             value: body || '(empty)',
@@ -136,6 +152,7 @@ export function parse(input: unknown, fileName: string): Session {
         preview: oneLine(body),
         start: human ? at : Math.min(cursor, at),
         end: at,
+        injectedChars: body.length,
         fields: [{ label: human ? 'Prompt' : 'Content', value: body, format: 'text' }],
         raw: r,
       })
@@ -156,6 +173,7 @@ export function parse(input: unknown, fileName: string): Session {
           : oneLine(JSON.stringify(r)),
       start: Math.min(cursor, at),
       end: at,
+      injectedChars: a ? JSON.stringify(a).length : 0,
       fields: valueFields(a ? 'Attachment' : 'Event', a ?? r),
       raw: r,
     })
@@ -163,7 +181,7 @@ export function parse(input: unknown, fileName: string): Session {
     i++
   }
 
-  const steps = finalizeSteps(drafts, endedAt)
+  const steps = attributeInput(finalizeSteps(drafts, endedAt), marks)
   const first = events[0] ?? {}
   const meta = (type: string) => records.find((r) => r.type === type) ?? {}
   const firstPrompt = steps.find((s) => s.kind === 'prompt')
@@ -188,7 +206,8 @@ export function parse(input: unknown, fileName: string): Session {
     endedAt,
     durationMs: endedAt - startedAt,
     steps,
-    tokens: sumTokens(steps),
+    tokens: sumRequests(steps),
+    contributed: sumTokens(steps),
     costUsd: 0,
     facts,
     fileName,

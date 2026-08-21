@@ -24,6 +24,8 @@ export interface Step {
   end: number
   durationMs: number
   tokens: Tokens
+  request?: Tokens
+  injectedChars: number
   costUsd: number
   isError: boolean
   model?: string
@@ -47,13 +49,17 @@ export interface Session {
   durationMs: number
   steps: Step[]
   tokens: Tokens
+  contributed: Tokens
   costUsd: number
   facts: Fact[]
   fileName: string
 }
 
-export type DraftStep = Omit<Step, 'index' | 'end' | 'durationMs' | 'tokens' | 'costUsd' | 'isError'> &
-  Partial<Pick<Step, 'end' | 'tokens' | 'costUsd' | 'isError'>>
+export type DraftStep = Omit<
+  Step,
+  'index' | 'end' | 'durationMs' | 'tokens' | 'costUsd' | 'isError' | 'injectedChars'
+> &
+  Partial<Pick<Step, 'end' | 'tokens' | 'costUsd' | 'isError' | 'injectedChars'>>
 
 export const noTokens = (): Tokens => ({ input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 })
 
@@ -75,6 +81,9 @@ export const addTokens = (a: Tokens, b: Tokens): Tokens => ({
 
 export const sumTokens = (steps: Step[]): Tokens => steps.reduce((a, s) => addTokens(a, s.tokens), noTokens())
 
+export const sumRequests = (steps: Step[]): Tokens =>
+  steps.reduce((a, s) => (s.request ? addTokens(a, s.request) : a), noTokens())
+
 export function finalizeSteps(drafts: DraftStep[], sessionEnd: number): Step[] {
   const sorted = [...drafts].sort((a, b) => a.start - b.start)
   return sorted.map((d, i) => {
@@ -87,6 +96,7 @@ export function finalizeSteps(drafts: DraftStep[], sessionEnd: number): Step[] {
       end,
       durationMs: end - d.start,
       tokens: d.tokens ?? noTokens(),
+      injectedChars: d.injectedChars ?? 0,
       costUsd: d.costUsd ?? 0,
       isError: d.isError ?? false,
     }
@@ -136,7 +146,13 @@ export function idleDraft(id: string, start: number, end: number): DraftStep {
     preview: 'Nothing ran while the session waited for the next prompt',
     start,
     end,
-    fields: [{ label: 'Gap', value: `${((end - start) / 1000).toFixed(1)}s between the last reply and the next prompt`, format: 'text' }],
+    fields: [
+      {
+        label: 'Gap',
+        value: `${((end - start) / 1000).toFixed(1)}s between the last reply and the next prompt`,
+        format: 'text',
+      },
+    ],
     raw: null,
   }
 }
@@ -153,6 +169,7 @@ export interface BlockDraft {
   isError?: boolean
   model?: string
   end?: number
+  injectedChars?: number
 }
 
 export interface GroupUsage {
@@ -184,6 +201,7 @@ const share = (total: number, weights: number[]): number[] => {
 
 export interface Allocation {
   tokens: Tokens
+  request?: Tokens
   costUsd: number
 }
 
@@ -200,15 +218,10 @@ export function allocateTokens(blocks: BlockDraft[], usage: GroupUsage): Allocat
     distribute(thinkingTotal, weightsOf(thinkers)).forEach((v, k) => (outputs[thinkers[k]!] = v))
     distribute(output - thinkingTotal, weightsOf(others)).forEach((v, k) => (outputs[others[k]!] = v))
   }
-  const costs = share(usage.costUsd, outputs)
   return blocks.map((_, i) => ({
-    tokens: tokensOf({
-      input: i === 0 ? usage.tokens.input : 0,
-      output: outputs[i] as number,
-      cacheRead: i === 0 ? usage.tokens.cacheRead : 0,
-      cacheWrite: i === 0 ? usage.tokens.cacheWrite : 0,
-    }),
-    costUsd: costs[i] ?? 0,
+    tokens: tokensOf({ output: outputs[i] as number }),
+    request: i === 0 ? usage.tokens : undefined,
+    costUsd: i === 0 ? usage.costUsd : 0,
   }))
 }
 
@@ -227,9 +240,11 @@ export function toDraft(block: BlockDraft, span: { start: number; end: number },
     raw: block.raw,
     model: block.model,
     isError: block.isError ?? false,
+    injectedChars: block.injectedChars ?? 0,
     start: span.start,
     end: span.end,
     tokens: alloc?.tokens,
+    request: alloc?.request,
     costUsd: alloc?.costUsd,
   }
 }
@@ -289,8 +304,9 @@ if (import.meta.vitest) {
       costUsd: 0,
     })
     expect(steps.map((s) => s.tokens?.output)).toEqual([300, 210, 490])
-    expect(steps[0]!.tokens?.cacheRead).toBe(200)
-    expect(steps[1]!.tokens?.cacheRead).toBe(0)
+    expect(steps.map((s) => s.tokens?.total)).toEqual([300, 210, 490])
+    expect(steps[0]!.request?.cacheRead).toBe(200)
+    expect(steps[1]!.request).toBeUndefined()
   })
   it('spreads a span over blocks that have no timestamps of their own', () => {
     const steps = expandGroup([block('a', 1), block('b', 3)], 0, 100)
@@ -298,5 +314,88 @@ if (import.meta.vitest) {
       [0, 25],
       [25, 100],
     ])
+  })
+}
+
+const CHARS_PER_TOKEN = 4
+
+export interface RequestMark {
+  at: number
+  context: number
+  output: number
+}
+
+export function attributeInput(steps: Step[], requests: RequestMark[]): Step[] {
+  const marks = [...requests].sort((a, b) => a.at - b.at)
+  const groups = new Map<number, Step[]>()
+  for (const step of steps) {
+    if (step.injectedChars <= 0) continue
+    const index = marks.findIndex((m) => m.at >= step.end)
+    if (index < 0) continue
+    groups.set(index, [...(groups.get(index) ?? []), step])
+  }
+  groups.forEach((members, index) => {
+    const mark = marks[index] as RequestMark
+    const previous = marks[index - 1]
+    const budget = Math.max(0, mark.context - (previous ? previous.context + previous.output : 0))
+    const estimates = members.map((s) => Math.max(1, Math.round(s.injectedChars / CHARS_PER_TOKEN)))
+    const estimated = estimates.reduce((a, b) => a + b, 0)
+    const scale = budget > 0 ? Math.min(1, budget / estimated) : 1
+    members.forEach((step, i) => {
+      step.tokens = tokensOf({ input: Math.round((estimates[i] as number) * scale), output: step.tokens.output })
+    })
+  })
+  return steps
+}
+
+export const contextOf = (t: Tokens): number => t.input + t.cacheRead + t.cacheWrite
+
+if (import.meta.vitest) {
+  const { it, expect } = import.meta.vitest
+  const step = (id: string, end: number, chars: number, output = 0): Step => ({
+    id,
+    index: 0,
+    kind: 'meta',
+    label: '',
+    preview: '',
+    start: end,
+    end,
+    durationMs: 0,
+    tokens: tokensOf({ output }),
+    injectedChars: chars,
+    costUsd: 0,
+    isError: false,
+    fields: [],
+    raw: null,
+  })
+
+  it('charges a step only for the content it adds, never for re-sent context', () => {
+    const late = step('late-prompt', 300, 40)
+    attributeInput(
+      [step('first-prompt', 100, 400), late],
+      [
+        { at: 100, context: 20000, output: 500 },
+        { at: 300, context: 40000, output: 200 },
+      ],
+    )
+    expect(late.tokens.total).toBe(10)
+  })
+
+  it('scales estimates down when the measured context grew by less', () => {
+    const a = step('a', 10, 4000)
+    attributeInput([a], [{ at: 10, context: 100, output: 0 }])
+    expect(a.tokens.input).toBe(100)
+  })
+
+  it('falls back to the size estimate when the measured growth is unusable', () => {
+    const a = step('a', 10, 4000)
+    attributeInput([a], [{ at: 10, context: 0, output: 0 }])
+    expect(a.tokens.input).toBe(1000)
+  })
+
+  it('leaves the unexplained baseline unattributed rather than inflating a step', () => {
+    const a = step('a', 10, 400)
+    attributeInput([a], [{ at: 10, context: 26000, output: 0 }])
+    expect(a.tokens.input).toBe(100)
   })
 }

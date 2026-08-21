@@ -63,9 +63,19 @@ if (import.meta.vitest) {
     expect(s.model).toBe('claude-opus-5')
     expect(s.steps.filter((x) => x.kind === 'tool').length).toBe(4)
     expect(s.steps.every((x) => x.durationMs >= 0)).toBe(true)
-    expect(s.tokens.output).toBe(9204)
     expect(s.tokens.total).toBe(174050)
-    expect(Math.round(s.durationMs / 1000)).toBe(120)
+    expect(s.contributed.output).toBe(9204)
+  })
+
+  it('sizes a step by what it adds, not by the context re-sent with it', async () => {
+    const s = await load('claude-code-threejs-earth-session.jsonl')
+    const biggest = [...s.steps].sort((a, b) => b.tokens.total - a.tokens.total)[0]!
+    const lastPrompt = s.steps.filter((x) => x.kind === 'prompt').at(-1)!
+    expect(biggest.label).toBe('Bash')
+    expect(lastPrompt.preview).toBe('open it')
+    expect(lastPrompt.tokens.total).toBeLessThan(20)
+    expect(s.steps.every((x) => x.tokens.total <= x.tokens.input + x.tokens.output)).toBe(true)
+    expect(s.contributed.total).toBeLessThan(s.tokens.total)
   })
   it('parses a goose session', async () => {
     const s = await load('goose-threejs-earth-session.json')
@@ -75,6 +85,8 @@ if (import.meta.vitest) {
     expect(s.steps.every((x) => x.durationMs >= 0)).toBe(true)
     expect(Math.round(s.costUsd * 100) / 100).toBe(0.65)
     expect(s.tokens.total).toBe(306659)
+    expect(s.contributed.output).toBe(14366)
+    expect(Math.round(s.durationMs / 1000)).toBe(321)
   })
   it('rejects files it cannot recognize', () => {
     expect(() => parseSessionText('{"hello":"world"}', 'x.json')).toThrow(UnknownSessionError)

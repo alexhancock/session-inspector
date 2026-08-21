@@ -24,17 +24,18 @@ export function Detail({ session, step, hasPrev, hasNext, onMove, onClose }: Pro
   }, [onClose, onMove, hasPrev, hasNext])
 
   const t = step.tokens
+  const r = step.request
   const meta: [string, string][] = [
     ['Kind', KIND_NAME[step.kind]],
     ['Step', `${step.index + 1} of ${session.steps.length}`],
     ['Started', `${clock(step.start)} · ${offset(step.start - session.startedAt)} in`],
     ['Duration', duration(step.durationMs)],
     ['Share of session', `${((step.durationMs / Math.max(1, session.durationMs)) * 100).toFixed(1)}%`],
-    ['Tokens', t.total ? count(t.total) : '—'],
-    ['Output', t.output ? count(t.output) : '—'],
-    ['Input', t.input ? count(t.input) : '—'],
-    ['Cache read', t.cacheRead ? count(t.cacheRead) : '—'],
-    ['Cache write', t.cacheWrite ? count(t.cacheWrite) : '—'],
+    ['Contributed', t.total ? count(t.total) : '—'],
+    ['Added to context', t.input ? count(t.input) : '—'],
+    ['Generated', t.output ? count(t.output) : '—'],
+    ['Charged on this request', r ? count(r.total) : '—'],
+    ['Read from cache', r?.cacheRead ? count(r.cacheRead) : '—'],
     ['Cost', step.costUsd ? cost(step.costUsd) : '—'],
     ['Model', step.model ?? session.model],
   ]

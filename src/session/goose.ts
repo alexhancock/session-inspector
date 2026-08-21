@@ -2,11 +2,15 @@ import {
   BlockDraft,
   DraftStep,
   Fact,
+  RequestMark,
   Session,
+  attributeInput,
+  contextOf,
   expandGroup,
   finalizeSteps,
   idleDraft,
   oneLine,
+  sumRequests,
   sumTokens,
   tokensOf,
 } from './model'
@@ -28,6 +32,7 @@ export function parse(input: unknown, fileName: string): Session {
   const endedAt = Math.max(Date.parse(d.updated_at) || 0, startedAt)
 
   const drafts: DraftStep[] = []
+  const marks: RequestMark[] = []
   const pendingTools = new Map<string, DraftStep>()
   let cursor = startedAt
   let i = 0
@@ -49,13 +54,15 @@ export function parse(input: unknown, fileName: string): Session {
       const blocks: BlockDraft[] = group.flatMap((msg, gi) =>
         (msg.content as Rec[]).map((b, bi) => blockDraft(b, `${msg.id}-${gi}-${bi}`, msg)),
       )
+      const tokens = tokensOf({
+        input: Math.max(0, (usage?.inputTokens ?? 0) - (usage?.cacheReadTokens ?? 0) - (usage?.cacheWriteTokens ?? 0)),
+        output: usage?.outputTokens ?? 0,
+        cacheRead: usage?.cacheReadTokens ?? 0,
+        cacheWrite: usage?.cacheWriteTokens ?? 0,
+      })
+      if (usage) marks.push({ at: start, context: contextOf(tokens), output: tokens.output })
       const steps = expandGroup(blocks, start, groupEnd, {
-        tokens: tokensOf({
-          input: Math.max(0, (usage?.inputTokens ?? 0) - (usage?.cacheReadTokens ?? 0) - (usage?.cacheWriteTokens ?? 0)),
-          output: usage?.outputTokens ?? 0,
-          cacheRead: usage?.cacheReadTokens ?? 0,
-          cacheWrite: usage?.cacheWriteTokens ?? 0,
-        }),
+        tokens,
         thinkingTokens: 0,
         costUsd: usage?.cost ?? 0,
       })
@@ -79,6 +86,7 @@ export function parse(input: unknown, fileName: string): Session {
         const body = result.content ? textOf(result.content) : textOf(b.toolResult?.error ?? result)
         if (!step) return
         step.isError = step.isError || failed
+        step.injectedChars = body.length
         step.fields.push({
           label: failed ? 'Error' : 'Result',
           value: body || '(empty)',
@@ -104,6 +112,7 @@ export function parse(input: unknown, fileName: string): Session {
       preview: oneLine(body),
       start: visible ? at : Math.min(cursor, at),
       end: at,
+      injectedChars: body.length,
       fields: [{ label: visible ? 'Prompt' : 'Content', value: body, format: 'text' }],
       raw: m,
     })
@@ -112,7 +121,7 @@ export function parse(input: unknown, fileName: string): Session {
   }
 
   extendPrevious(drafts, endedAt)
-  const steps = finalizeSteps(drafts, endedAt)
+  const steps = attributeInput(finalizeSteps(drafts, endedAt), marks)
   const model = d.model_config?.model_name ?? ''
   const extensions: string[] = (d.extension_data?.['enabled_extensions.v0']?.extensions ?? []).map(
     (e: Rec) => e.display_name ?? e.name,
@@ -141,7 +150,8 @@ export function parse(input: unknown, fileName: string): Session {
     endedAt,
     durationMs: endedAt - startedAt,
     steps,
-    tokens: sumTokens(steps),
+    tokens: sumRequests(steps),
+    contributed: sumTokens(steps),
     costUsd: steps.reduce((a, s) => a + s.costUsd, 0) || d.accumulated_cost || 0,
     facts,
     fileName,

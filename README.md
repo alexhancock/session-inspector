@@ -52,10 +52,26 @@ reconstructed. The rules:
   `Bash` heredoc land on that tool call rather than on the message before it. Tool steps
   extend to their result and record the split in a `Timing` field
   ("46.7s writing the call, 2.5s running it").
-- **Usage is per API request, split across the blocks it produced.** Output tokens are
-  divided by block size, with reasoning tokens going to thinking blocks; input and cache
-  tokens sit on the request's first block. Totals stay exact — the two demo sessions sum
-  to the totals their own files report (174,050 and 306,659 tokens; $0.6549).
+- **A step is sized by what it contributes, not by what it was charged.** An agent
+  re-sends the whole conversation on every request, so per-request usage makes every
+  late step look enormous — a three-word follow-up prompt would outrank the tool call
+  that wrote a 10KB file. Each step is instead credited with the tokens it *added*:
+  what the model generated for that block, plus what the block injected into the
+  context (a prompt's text, a tool result, an attachment).
+  - Output is exact, split across a response's blocks by size, with reasoning tokens
+    going to thinking blocks.
+  - Input is estimated from content size, then calibrated against how much the measured
+    context actually grew between consecutive requests. If the measured growth is
+    smaller than the estimate, the estimate scales down; if it's larger, the excess (the
+    system prompt and tool definitions, which no step represents) is left unattributed
+    rather than inflating a step. Where an agent's own numbers make the growth
+    unusable, the size estimate stands on its own.
+- **The billed totals are still reported, at the session level.** The stat band shows
+  `Conversation` (the sum of contributions) next to `Charged` (what the requests
+  actually cost, cache included), and a step's detail shows both. The two demo sessions
+  charge 174,050 and 306,659 tokens — matching their own files — while contributing
+  about 13k and 18k.
+
 - **Gaps before a human prompt become explicit `Waiting for you` steps**, so idle time is
   visible instead of inflating whatever ran last.
 
