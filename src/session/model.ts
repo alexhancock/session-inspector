@@ -25,7 +25,7 @@ export interface Step {
   durationMs: number
   tokens: Tokens
   request?: Tokens
-  injectedChars: number
+  injectedTokens: number
   costUsd: number
   isError: boolean
   model?: string
@@ -63,9 +63,9 @@ export interface Session {
 
 export type DraftStep = Omit<
   Step,
-  'index' | 'end' | 'durationMs' | 'tokens' | 'costUsd' | 'isError' | 'injectedChars'
+  'index' | 'end' | 'durationMs' | 'tokens' | 'costUsd' | 'isError' | 'injectedTokens'
 > &
-  Partial<Pick<Step, 'end' | 'tokens' | 'costUsd' | 'isError' | 'injectedChars'>>
+  Partial<Pick<Step, 'end' | 'tokens' | 'costUsd' | 'isError' | 'injectedTokens'>>
 
 export const noTokens = (): Tokens => ({ input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 })
 
@@ -102,7 +102,7 @@ export function finalizeSteps(drafts: DraftStep[], sessionEnd: number): Step[] {
       end,
       durationMs: end - d.start,
       tokens: d.tokens ?? noTokens(),
-      injectedChars: d.injectedChars ?? 0,
+      injectedTokens: d.injectedTokens ?? 0,
       costUsd: d.costUsd ?? 0,
       isError: d.isError ?? false,
     }
@@ -169,7 +169,7 @@ export interface BlockDraft {
   isError?: boolean
   model?: string
   end?: number
-  injectedChars?: number
+  injectedTokens?: number
 }
 
 export interface GroupUsage {
@@ -240,7 +240,7 @@ export function toDraft(block: BlockDraft, span: { start: number; end: number },
     raw: block.raw,
     model: block.model,
     isError: block.isError ?? false,
-    injectedChars: block.injectedChars ?? 0,
+    injectedTokens: block.injectedTokens ?? 0,
     start: span.start,
     end: span.end,
     tokens: alloc?.tokens,
@@ -319,8 +319,6 @@ if (import.meta.vitest) {
   })
 }
 
-const CHARS_PER_TOKEN = 4
-
 export interface RequestMark {
   at: number
   context: number
@@ -331,7 +329,7 @@ export function attributeInput(steps: Step[], requests: RequestMark[]): Step[] {
   const marks = [...requests].sort((a, b) => a.at - b.at)
   const groups = new Map<number, Step[]>()
   for (const step of steps) {
-    if (step.injectedChars <= 0) continue
+    if (step.injectedTokens <= 0) continue
     const index = marks.findIndex((m) => m.at >= step.end)
     if (index < 0) continue
     groups.set(index, [...(groups.get(index) ?? []), step])
@@ -340,7 +338,7 @@ export function attributeInput(steps: Step[], requests: RequestMark[]): Step[] {
     const mark = marks[index] as RequestMark
     const previous = marks[index - 1]
     const budget = Math.max(0, mark.context - (previous ? previous.context + previous.output : 0))
-    const estimates = members.map((s) => Math.max(1, Math.round(s.injectedChars / CHARS_PER_TOKEN)))
+    const estimates = members.map((s) => s.injectedTokens)
     const estimated = estimates.reduce((a, b) => a + b, 0)
     const scale = budget > 0 ? Math.min(1, budget / estimated) : 1
     members.forEach((step, i) => {
@@ -354,7 +352,7 @@ export const contextOf = (t: Tokens): number => t.input + t.cacheRead + t.cacheW
 
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest
-  const step = (id: string, end: number, chars: number, output = 0): Step => ({
+  const step = (id: string, end: number, injectedTokens: number, output = 0): Step => ({
     id,
     index: 0,
     kind: 'meta',
@@ -364,7 +362,7 @@ if (import.meta.vitest) {
     end,
     durationMs: 0,
     tokens: tokensOf({ output }),
-    injectedChars: chars,
+    injectedTokens,
     costUsd: 0,
     isError: false,
     fields: [],
@@ -372,9 +370,9 @@ if (import.meta.vitest) {
   })
 
   it('charges a step only for the content it adds, never for re-sent context', () => {
-    const late = step('late-prompt', 300, 40)
+    const late = step('late-prompt', 300, 10)
     attributeInput(
-      [step('first-prompt', 100, 400), late],
+      [step('first-prompt', 100, 100), late],
       [
         { at: 100, context: 20000, output: 500 },
         { at: 300, context: 40000, output: 200 },
@@ -384,19 +382,19 @@ if (import.meta.vitest) {
   })
 
   it('scales estimates down when the measured context grew by less', () => {
-    const a = step('a', 10, 4000)
+    const a = step('a', 10, 1000)
     attributeInput([a], [{ at: 10, context: 100, output: 0 }])
     expect(a.tokens.input).toBe(100)
   })
 
   it('falls back to the size estimate when the measured growth is unusable', () => {
-    const a = step('a', 10, 4000)
+    const a = step('a', 10, 1000)
     attributeInput([a], [{ at: 10, context: 0, output: 0 }])
     expect(a.tokens.input).toBe(1000)
   })
 
   it('leaves the unexplained baseline unattributed rather than inflating a step', () => {
-    const a = step('a', 10, 400)
+    const a = step('a', 10, 100)
     attributeInput([a], [{ at: 10, context: 26000, output: 0 }])
     expect(a.tokens.input).toBe(100)
   })

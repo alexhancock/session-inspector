@@ -19,6 +19,7 @@ import {
   toDraft,
   tokensOf,
 } from './model'
+import { estimateTokens } from './estimate'
 import { argFields, argPreview, valueFields } from './render'
 
 const IDLE_MS = 1500
@@ -70,7 +71,7 @@ export function buildSession(harness: Harness, file: SessionFile): Session {
         const wrote = step.end ?? step.start
         step.end = Math.max(wrote, at)
         step.isError = event.failed
-        step.injectedChars = event.text.length
+        step.injectedTokens = estimateTokens(event.text)
         step.fields.push({
           label: event.failed ? 'Error' : 'Result',
           value: event.text || '(empty)',
@@ -98,7 +99,7 @@ export function buildSession(harness: Harness, file: SessionFile): Session {
         preview: oneLine(event.text),
         start: at,
         end: at,
-        injectedChars: event.text.length,
+        injectedTokens: estimateTokens(event.text),
         fields: [{ label: 'Prompt', value: event.text, format: 'text' }],
         raw: event.raw ?? event,
       })
@@ -113,7 +114,7 @@ export function buildSession(harness: Harness, file: SessionFile): Session {
       preview: event.preview ?? oneLine(event.context ?? JSON.stringify(event.detail ?? null)),
       start: Math.min(cursor, at),
       end: at,
-      injectedChars: event.context?.length ?? 0,
+      injectedTokens: estimateTokens(event.context ?? ''),
       fields: valueFields(event.label, event.detail),
       raw: event.raw ?? event.detail,
     })

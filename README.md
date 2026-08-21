@@ -79,12 +79,22 @@ reconstructed. The rules:
   context (a prompt's text, a tool result, an attachment).
   - Output is exact, split across a response's blocks by size, with reasoning tokens
     going to thinking blocks.
-  - Input is estimated from content size, then calibrated against how much the measured
-    context actually grew between consecutive requests. If the measured growth is
-    smaller than the estimate, the estimate scales down; if it's larger, the excess (the
-    system prompt and tool definitions, which no step represents) is left unattributed
-    rather than inflating a step. Where an agent's own numbers make the growth
-    unusable, the size estimate stands on its own.
+  - Input is estimated by `src/session/estimate.ts`, then calibrated against how much
+    the measured context actually grew between consecutive requests. If the measured
+    growth is smaller than the estimate, the estimate scales down; if it's larger, the
+    excess (the system prompt and tool definitions, which no step represents) is left
+    unattributed rather than inflating a step. Where an agent's own numbers make the
+    growth unusable, the estimate stands on its own.
+
+    The estimator is one line — characters ÷ 2.5 — and that divisor is measured, not
+    guessed. Against the 11 request gaps in the demo sessions where the transcripts
+    record real context growth, it lands within 15% (median), mean ratio 0.99. A real
+    BPE tokenizer was tried and rejected: `gpt-tokenizer`'s `cl100k_base` scored *worse*
+    on the same gaps (21% median, mean 0.84) while adding 449 KB gzipped to a 115 KB
+    bundle. It measures the text precisely but still misses the per-message framing —
+    role tokens, content-block JSON, tool-result wrappers — that the divisor absorbs.
+    Anthropic also documents that OpenAI tokenizers are simply wrong for Claude. Swap
+    the estimator in that one file if a harness ever needs something better.
 - **The billed totals are still reported, at the session level.** The stat band shows
   `Conversation` (the sum of contributions) next to `Charged` (what the requests
   actually cost, cache included), and a step's detail shows both. The two demo sessions
