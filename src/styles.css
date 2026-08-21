@@ -292,11 +292,11 @@ button {
 .demo {
   border: 1px solid var(--ink);
   background: var(--card);
-  padding: 7px 11px;
-  text-align: left;
+  padding: 8px 14px;
+  font-size: 13px;
+  letter-spacing: -0.012em;
   cursor: grab;
   transition: background 0.12s, color 0.12s;
-  min-width: 128px;
 }
 
 .demo:hover {
@@ -304,23 +304,8 @@ button {
   color: var(--card);
 }
 
-.demo:hover .label {
-  color: rgba(251, 251, 246, 0.7);
-}
-
 .demo:active {
   cursor: grabbing;
-}
-
-.demo .label {
-  display: block;
-}
-
-.demo-name {
-  display: block;
-  font-size: 13px;
-  letter-spacing: -0.012em;
-  margin-top: 2px;
 }
 
 .error {
@@ -825,6 +810,18 @@ button {
   overflow: auto;
   max-height: 52vh;
   white-space: pre;
+}
+
+@media (max-width: 520px) {
+  .masthead {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .masthead-note {
+    text-align: left;
+    padding-top: 0;
+  }
 }
 
 @media (max-width: 900px) {

@@ -4,7 +4,6 @@ import { mountBackdrop } from './backdrop'
 export interface Demo {
   id: string
   agent: string
-  name: string
   fileName: string
   text: string
 }
@@ -76,11 +75,13 @@ export function Landing({ demos, error, busy, onFiles, onDemo }: Props) {
             <em>Inspector</em>
           </h1>
           <span className="label masthead-note">
-            Every step, token,
+            Drop in a session
             <br />
-            and second of an
+            to see where the time
             <br />
-            agentic session
+            and tokens went,
+            <br />
+            then open any step
           </span>
         </div>
 
@@ -143,7 +144,7 @@ export function Landing({ demos, error, busy, onFiles, onDemo }: Props) {
             i
           </button>
           <div className="demos">
-            <span className="label">Try one</span>
+            <span className="label">Try a demo session</span>
             {demos.map((d) => (
               <button
                 key={d.id}
@@ -156,8 +157,7 @@ export function Landing({ demos, error, busy, onFiles, onDemo }: Props) {
                 }}
                 onClick={() => onDemo(d)}
               >
-                <span className="label">{d.agent}</span>
-                <span className="demo-name">{d.name}</span>
+                {d.agent}
               </button>
             ))}
           </div>
