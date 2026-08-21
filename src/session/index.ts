@@ -19,7 +19,7 @@ export function parseSessionText(text: string, fileName: string): Session {
       'Not a session we recognize yet. Drop a Claude Code .jsonl transcript or a goose .json session.',
     )
   }
-  return adapter.parse(input, fileName, new Blob([text]).size)
+  return adapter.parse(input, fileName)
 }
 
 export async function readSessionFile(file: File): Promise<Session> {

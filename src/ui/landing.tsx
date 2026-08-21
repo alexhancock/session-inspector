@@ -19,10 +19,30 @@ interface Props {
 
 const DEMO_MIME = 'application/x-session-demo'
 
+const GUIDES = [
+  {
+    agent: 'Claude Code',
+    steps: [
+      'Transcripts are written as you work to `~/.claude/projects/<project>/<session-id>.jsonl`.',
+      'Copy that file out and drop it here. `/export` writes readable text, not this format.',
+    ],
+    href: 'https://code.claude.com/docs/en/sessions#export-and-locate-session-data',
+  },
+  {
+    agent: 'goose',
+    steps: [
+      'Desktop: open Session History, hover a session, and export it as JSON.',
+      'Terminal: run `goose session export` and choose the JSON format.',
+    ],
+    href: 'https://goose-docs.ai/docs/guides/sessions/session-management#export-sessions',
+  },
+]
+
 export function Landing({ demos, error, busy, onFiles, onDemo }: Props) {
   const canvas = useRef<HTMLCanvasElement>(null)
   const input = useRef<HTMLInputElement>(null)
   const [over, setOver] = useState(false)
+  const [guide, setGuide] = useState(false)
 
   useEffect(() => (canvas.current ? mountBackdrop(canvas.current) : undefined), [])
 
@@ -55,10 +75,12 @@ export function Landing({ demos, error, busy, onFiles, onDemo }: Props) {
             <br />
             <em>Inspector</em>
           </h1>
-          <span className="label">
-            Claude Code
+          <span className="label masthead-note">
+            Every step, token,
             <br />
-            goose
+            and second of an
+            <br />
+            agentic session
           </span>
         </div>
 
@@ -71,16 +93,10 @@ export function Landing({ demos, error, busy, onFiles, onDemo }: Props) {
             <span />
             <span />
           </span>
-          <span className="label">{busy ? 'Reading the file' : over ? 'Release to open' : 'Drop a session file'}</span>
-          <span className="drop-head">
-            Every step, token, and second
-            <br />
-            of an agentic session.
+          <span className="drop-zone">
+            <span className="drop-head">{busy ? 'Reading' : over ? 'Release to open' : 'Drop a session file'}</span>
+            <span className="label drop-formats">Claude Code .jsonl · goose .json</span>
           </span>
-          <p className="drop-sub">
-            Drag in a <span className="mono">.jsonl</span> transcript or a <span className="mono">.json</span> session —
-            or click to browse.
-          </p>
         </button>
 
         <input
@@ -97,8 +113,35 @@ export function Landing({ demos, error, busy, onFiles, onDemo }: Props) {
 
         {error && <p className="error">{error}</p>}
 
+        {guide && (
+          <div className="guide">
+            {GUIDES.map((g) => (
+              <div className="guide-col" key={g.agent}>
+                <div className="label">{g.agent}</div>
+                {g.steps.map((step) => (
+                  <p key={step}>
+                    {step.split('`').map((part, i) => (i % 2 ? <code key={i}>{part}</code> : part))}
+                  </p>
+                ))}
+                <a href={g.href} target="_blank" rel="noreferrer noopener">
+                  Docs ↗
+                </a>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="sheet-foot">
-          <span className="label">Parsed in your browser · nothing is uploaded</span>
+          <button
+            type="button"
+            className="info"
+            aria-expanded={guide}
+            aria-label="Where to find your session file"
+            title="Where to find your session file"
+            onClick={() => setGuide(!guide)}
+          >
+            i
+          </button>
           <div className="demos">
             <span className="label">Try one</span>
             {demos.map((d) => (

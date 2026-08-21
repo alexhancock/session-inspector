@@ -31,7 +31,7 @@ export function detect(input: unknown): boolean {
   )
 }
 
-export function parse(input: unknown, fileName: string, fileBytes: number): Session {
+export function parse(input: unknown, fileName: string): Session {
   const records = (input as Rec[]).filter((r) => r && typeof r === 'object')
   const events = records.filter(isEvent).sort((a, b) => ts(a) - ts(b))
   const startedAt = events.length ? ts(events[0]!) : Date.now()
@@ -192,7 +192,6 @@ export function parse(input: unknown, fileName: string, fileBytes: number): Sess
     costUsd: 0,
     facts,
     fileName,
-    fileBytes,
   }
 }
 

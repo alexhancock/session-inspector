@@ -89,32 +89,32 @@ button {
 .sheet {
   position: relative;
   z-index: 2;
-  width: min(720px, 100%);
+  width: min(880px, 100%);
   background: var(--card);
   border: 1.5px solid var(--ink);
-  box-shadow: 14px 14px 0 rgba(18, 18, 18, 0.14);
+  box-shadow: 16px 16px 0 rgba(18, 18, 18, 0.14);
   transition: box-shadow 0.15s;
 }
 
 .sheet.over {
-  box-shadow: 14px 14px 0 var(--red);
+  box-shadow: 16px 16px 0 var(--red);
 }
 
 .masthead {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
-  padding: 22px 26px 18px;
+  gap: 24px;
+  padding: 28px 32px 24px;
   border-bottom: 1.5px solid var(--ink);
 }
 
 .masthead h1 {
   margin: 0;
-  font-size: clamp(38px, 6vw, 62px);
-  letter-spacing: -0.042em;
+  font-size: clamp(40px, 6.4vw, 68px);
+  letter-spacing: -0.044em;
   font-weight: 700;
-  line-height: 0.9;
+  line-height: 0.88;
   text-transform: uppercase;
 }
 
@@ -123,10 +123,10 @@ button {
   color: var(--red);
 }
 
-.masthead .label {
+.masthead-note {
   text-align: right;
-  line-height: 1.7;
-  padding-top: 5px;
+  line-height: 1.8;
+  padding-top: 6px;
   white-space: nowrap;
 }
 
@@ -134,25 +134,19 @@ button {
   position: relative;
   display: block;
   width: 100%;
-  text-align: left;
-  padding: 30px 26px 34px;
+  padding: 26px;
   background: var(--card);
   transition: background 0.15s, color 0.15s;
   overflow: hidden;
 }
 
 .drop:hover {
-  background: #f5f5ef;
+  background: #f4f4ed;
 }
 
 .sheet.over .drop {
   background: var(--red);
   color: var(--card);
-}
-
-.sheet.over .drop .label,
-.sheet.over .drop .drop-sub {
-  color: rgba(251, 251, 246, 0.92);
 }
 
 .drop-grid {
@@ -172,31 +166,88 @@ button {
 }
 
 .sheet.over .drop-grid span {
-  border-color: rgba(251, 251, 246, 0.25);
+  border-color: rgba(251, 251, 246, 0.22);
 }
 
-.drop .label {
-  display: block;
-  margin-bottom: 14px;
+.drop-zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 236px;
+  border: 1px dashed rgba(18, 18, 18, 0.32);
+  transition: border-color 0.15s;
+}
+
+.drop:hover .drop-zone {
+  border-color: var(--ink);
+}
+
+.sheet.over .drop-zone {
+  border-color: rgba(251, 251, 246, 0.75);
+  border-style: solid;
 }
 
 .drop-head {
-  display: block;
-  font-size: clamp(23px, 3.4vw, 32px);
-  letter-spacing: -0.03em;
+  font-size: clamp(26px, 4vw, 40px);
+  letter-spacing: -0.035em;
   font-weight: 500;
-  line-height: 1.1;
-  margin-bottom: 14px;
-  position: relative;
+  line-height: 1;
 }
 
-.drop-sub {
+.drop-formats {
   color: var(--mute);
-  max-width: 46ch;
-  line-height: 1.55;
-  margin: 0;
-  position: relative;
-  font-size: 13px;
+}
+
+.sheet.over .drop-formats {
+  color: rgba(251, 251, 246, 0.92);
+}
+
+.guide {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  border-top: 1.5px solid var(--ink);
+}
+
+.guide-col {
+  padding: 16px 32px 18px;
+  border-left: 1px solid var(--hair);
+}
+
+.guide-col:first-child {
+  border-left: 0;
+}
+
+.guide-col p {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--mute);
+}
+
+.guide-col code {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink);
+  word-break: break-all;
+}
+
+.guide-col a {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink);
+}
+
+.guide-col a:hover {
+  color: var(--red);
+  border-color: var(--red);
 }
 
 .sheet-foot {
@@ -204,9 +255,31 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 12px 26px;
+  padding: 12px 32px;
   border-top: 1.5px solid var(--ink);
   flex-wrap: wrap;
+}
+
+.info {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  font-size: 11px;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--mute);
+  display: grid;
+  place-items: center;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.info:hover,
+.info[aria-expanded='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--card);
 }
 
 .demos {
@@ -254,7 +327,7 @@ button {
   border-top: 1.5px solid var(--ink);
   background: var(--red);
   color: var(--card);
-  padding: 11px 26px;
+  padding: 11px 32px;
   line-height: 1.45;
   margin: 0;
   font-size: 13px;
@@ -420,13 +493,13 @@ button {
 
 .row {
   display: grid;
-  grid-template-columns: 38px 162px minmax(0, 1fr) 186px;
+  grid-template-columns: 38px 162px minmax(0, 1fr) 268px;
   align-items: center;
   gap: 12px;
   width: 100%;
   text-align: left;
   padding: 0 20px;
-  height: 44px;
+  height: 50px;
   border-bottom: 1px solid var(--hair);
   position: relative;
   transition: background 0.1s;
@@ -489,15 +562,16 @@ button {
 
 .row-metric {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 64px;
+  grid-template-columns: minmax(0, 1fr) 72px;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .meter {
-  height: 9px;
-  background: rgba(18, 18, 18, 0.055);
+  height: 20px;
+  background: rgba(18, 18, 18, 0.05);
   position: relative;
+  box-shadow: inset 0 0 0 1px var(--hair);
 }
 
 .meter i {
@@ -509,7 +583,8 @@ button {
 .row-value {
   text-align: right;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .row.err .row-label::after {
@@ -588,20 +663,39 @@ button {
 
 /* ---------- detail ---------- */
 
-.detail {
+.scrim {
   position: fixed;
   inset: 0;
   z-index: 20;
+  background: rgba(18, 18, 18, 0.5);
+  display: grid;
+  place-items: center;
+  padding: min(4vh, 40px) min(4vw, 48px);
+  animation: fade 0.14s ease-out;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.detail {
+  width: 100%;
+  height: 100%;
   background: var(--paper);
+  border: 1.5px solid var(--ink);
+  box-shadow: 0 24px 60px rgba(18, 18, 18, 0.3);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
 }
 
 .detail-top {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px 20px;
+  padding: 12px 12px 12px 20px;
   border-bottom: 1.5px solid var(--ink);
   background: var(--card);
 }
@@ -627,7 +721,39 @@ button {
   margin-left: auto;
 }
 
-.nav button,
+.nav button {
+  border: 1px solid var(--ink);
+  width: 30px;
+  height: 28px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.nav button:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--card);
+}
+
+.nav button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.dismiss {
+  width: 30px;
+  height: 28px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--card);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.dismiss:hover {
+  background: var(--red);
+  border-color: var(--red);
+}
+
 .close {
   border: 1px solid var(--ink);
   padding: 5px 10px;
@@ -636,15 +762,9 @@ button {
   text-transform: uppercase;
 }
 
-.nav button:hover,
 .close:hover {
   background: var(--ink);
   color: var(--card);
-}
-
-.nav button:disabled {
-  opacity: 0.3;
-  cursor: default;
 }
 
 .detail-body {
@@ -688,7 +808,8 @@ button {
   word-break: break-word;
 }
 
-.field-body.code {
+.field-body.code,
+.field-body.json {
   font-family: var(--mono);
   font-size: 12px;
   line-height: 1.5;
@@ -696,18 +817,7 @@ button {
   border: 1px solid var(--hair);
   padding: 12px 14px;
   overflow: auto;
-  max-height: 62vh;
-  white-space: pre;
-}
-
-.field-body.json {
-  font-family: var(--mono);
-  font-size: 12px;
-  background: var(--card);
-  border: 1px solid var(--hair);
-  padding: 12px 14px;
-  overflow: auto;
-  max-height: 62vh;
+  max-height: 52vh;
   white-space: pre;
 }
 

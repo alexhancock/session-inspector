@@ -32,7 +32,7 @@ produce it. Write a module in `src/session/` exporting:
 
 ```ts
 export function detect(input: unknown): boolean
-export function parse(input: unknown, fileName: string, fileBytes: number): Session
+export function parse(input: unknown, fileName: string): Session
 ```
 
 and add it to the `adapters` list in `src/session/index.ts`. `input` is already decoded

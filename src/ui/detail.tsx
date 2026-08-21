@@ -40,54 +40,62 @@ export function Detail({ session, step, hasPrev, hasNext, onMove, onClose }: Pro
   ]
 
   return (
-    <div className="detail" role="dialog" aria-modal aria-label={`${step.label} detail`}>
-      <div className="detail-top">
-        <span className="chip" style={{ background: KIND_COLOR[step.kind] }} aria-hidden />
-        <h2>{step.label}</h2>
-        <span className="mono detail-sub">
-          {compact(step.tokens.total)} tok · {duration(step.durationMs)}
-        </span>
-        <div className="nav">
-          <button type="button" onClick={() => onMove(-1)} disabled={!hasPrev}>
-            ← Prev
-          </button>
-          <button type="button" onClick={() => onMove(1)} disabled={!hasNext}>
-            Next →
-          </button>
-          <button type="button" className="close" onClick={onClose}>
-            Close ⎋
+    <div className="scrim" onClick={onClose}>
+      <div
+        className="detail"
+        role="dialog"
+        aria-modal
+        aria-label={`${step.label} detail`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="detail-top">
+          <span className="chip" style={{ background: KIND_COLOR[step.kind] }} aria-hidden />
+          <h2>{step.label}</h2>
+          <span className="mono detail-sub">
+            {compact(step.tokens.total)} tok · {duration(step.durationMs)}
+          </span>
+          <div className="nav">
+            <button type="button" onClick={() => onMove(-1)} disabled={!hasPrev} aria-label="Previous step">
+              ←
+            </button>
+            <button type="button" onClick={() => onMove(1)} disabled={!hasNext} aria-label="Next step">
+              →
+            </button>
+          </div>
+          <button type="button" className="dismiss" onClick={onClose} aria-label="Close">
+            ✕
           </button>
         </div>
-      </div>
 
-      <div className="detail-body">
-        <div className="detail-meta">
-          {meta
-            .filter(([, v]) => v && v !== '—')
-            .map(([label, value]) => (
-              <div className="meta-row" key={label}>
-                <div className="label">{label}</div>
-                <div className="meta-value">{value}</div>
+        <div className="detail-body">
+          <div className="detail-meta">
+            {meta
+              .filter(([, v]) => v && v !== '—')
+              .map(([label, value]) => (
+                <div className="meta-row" key={label}>
+                  <div className="label">{label}</div>
+                  <div className="meta-value">{value}</div>
+                </div>
+              ))}
+          </div>
+
+          <div className="detail-fields">
+            {step.preview && step.fields.length === 0 && (
+              <div className="field">
+                <div className="label">Summary</div>
+                <div className="field-body">{step.preview}</div>
+              </div>
+            )}
+            {step.fields.map((f, i) => (
+              <div className="field" key={`${f.label}-${i}`}>
+                <div className="label">{f.label}</div>
+                <div className={`field-body ${f.format}`}>{f.value}</div>
               </div>
             ))}
-        </div>
-
-        <div className="detail-fields">
-          {step.preview && step.fields.length === 0 && (
             <div className="field">
-              <div className="label">Summary</div>
-              <div className="field-body">{step.preview}</div>
+              <div className="label">Raw record</div>
+              <div className="field-body json">{JSON.stringify(step.raw, null, 2)}</div>
             </div>
-          )}
-          {step.fields.map((f, i) => (
-            <div className="field" key={`${f.label}-${i}`}>
-              <div className="label">{f.label}</div>
-              <div className={`field-body ${f.format}`}>{f.value}</div>
-            </div>
-          ))}
-          <div className="field">
-            <div className="label">Raw record</div>
-            <div className="field-body json">{JSON.stringify(step.raw, null, 2)}</div>
           </div>
         </div>
       </div>

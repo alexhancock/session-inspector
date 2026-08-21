@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Session, Step } from '../session'
-import { bytes, clock, compact, count, cost, day, duration } from '../format'
+import { clock, compact, count, cost, day, duration } from '../format'
 import { KIND_COLOR, KIND_NAME, KIND_ORDER } from './palette'
 import { Treemap } from './treemap'
 import { Detail } from './detail'
@@ -54,9 +54,8 @@ export function Inspector({ session, onReset }: { session: Session; onReset: () 
         </span>
         <span className="badge solid label">{session.agent}</span>
         <span className="session-title">{session.title}</span>
-        <span className="badge mono" style={{ fontSize: 11 }}>{session.model}</span>
-        <span className="badge label mono" title={session.fileName}>
-          {bytes(session.fileBytes)}
+        <span className="badge mono" style={{ fontSize: 11 }} title={session.fileName}>
+          {session.model}
         </span>
         <button type="button" className="close" onClick={onReset}>
           New session
@@ -117,9 +116,13 @@ export function Inspector({ session, onReset }: { session: Session; onReset: () 
                 </span>
                 <span className="row-preview">{s.preview}</span>
                 <span className="row-metric">
-                  <span className="meter">
-                    <i style={{ width: `${(measure(s) / peak) * 100}%`, background: KIND_COLOR[s.kind] }} />
-                  </span>
+                  {measure(s) > 0 ? (
+                    <span className="meter">
+                      <i style={{ width: `${(measure(s) / peak) * 100}%`, background: KIND_COLOR[s.kind] }} />
+                    </span>
+                  ) : (
+                    <span />
+                  )}
                   <span className="row-value">
                     {metric === 'tokens' ? (s.tokens.total ? compact(s.tokens.total) : '—') : duration(s.durationMs)}
                   </span>

@@ -50,7 +50,6 @@ export interface Session {
   costUsd: number
   facts: Fact[]
   fileName: string
-  fileBytes: number
 }
 
 export type DraftStep = Omit<Step, 'index' | 'end' | 'durationMs' | 'tokens' | 'costUsd' | 'isError'> &

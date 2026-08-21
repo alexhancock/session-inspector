@@ -17,9 +17,6 @@ export function compact(n: number): string {
   return `${(n / 1_000_000).toFixed(1)}M`
 }
 
-export const bytes = (n: number): string =>
-  n < 1024 ? `${n} B` : n < 1024 * 1024 ? `${(n / 1024).toFixed(0)} KB` : `${(n / (1024 * 1024)).toFixed(1)} MB`
-
 export const cost = (usd: number): string => (usd >= 1 ? `$${usd.toFixed(2)}` : `$${usd.toFixed(4)}`)
 
 export const clock = (ms: number): string =>

@@ -1,4 +1,4 @@
-type Shape = 'fill' | 'circle' | 'quarter' | 'diagonal' | 'rules' | 'empty'
+type Shape = 'fill' | 'circle' | 'quarter' | 'diagonal' | 'empty'
 
 interface Rect {
   x: number
@@ -17,7 +17,8 @@ interface Cell {
 
 const PALETTE = ['#f0402c', '#1b7fd0', '#f3b71c', '#121212', '#e6e5d8', '#fbfbf6']
 const WEIGHTS = [0.18, 0.085, 0.07, 0.135, 0.28, 0.25]
-const COUNT = 62
+const COUNT = 34
+const MIN_AREA = 0.014
 const MORPH_MS = 1500
 const HOLD_MS = 3600
 
@@ -51,10 +52,10 @@ export function mountBackdrop(canvas: HTMLCanvasElement): () => void {
   }
 
   const shapeFor = (color: string, area: number): Shape => {
-    if (color === '#e6e5d8' || color === '#fbfbf6') return random() < 0.14 ? 'rules' : 'empty'
+    if (color === '#e6e5d8' || color === '#fbfbf6') return 'empty'
     const r = random()
-    if (area > 0.018 && r < 0.18) return 'circle'
-    if (area > 0.012 && r < 0.34) return 'quarter'
+    if (area > 0.03 && r < 0.14) return 'circle'
+    if (area > 0.025 && r < 0.36) return 'quarter'
     if (r < 0.46) return 'diagonal'
     return 'fill'
   }
@@ -63,7 +64,8 @@ export function mountBackdrop(canvas: HTMLCanvasElement): () => void {
     let rects: Rect[] = [{ x: 0, y: 0, w: 1, h: 1 }]
     const ratios = [0.5, 0.382, 0.618, 0.333, 0.667, 0.25]
     while (rects.length < n) {
-      const weights = rects.map((r) => Math.pow(r.w * r.h, 1.35))
+      const weights = rects.map((r) => (r.w * r.h > MIN_AREA * 2 ? Math.pow(r.w * r.h, 1.35) : 0))
+      if (!weights.some((v) => v > 0)) break
       let roll = random() * weights.reduce((a, b) => a + b, 0)
       let target = rects[rects.length - 1] as Rect
       for (let i = 0; i < rects.length; i++) {
@@ -153,16 +155,6 @@ export function mountBackdrop(canvas: HTMLCanvasElement): () => void {
         ctx.lineTo(p[4] as number, p[5] as number)
         ctx.closePath()
         ctx.fill()
-      } else if (c.shape === 'rules') {
-        ctx.fillRect(x, y, cw, ch)
-        ctx.strokeStyle = 'rgba(18,18,18,.3)'
-        const gap = Math.max(5, Math.min(cw, ch) / 8)
-        for (let i = y + gap; i < y + ch; i += gap) {
-          ctx.beginPath()
-          ctx.moveTo(x, Math.round(i) + 0.5)
-          ctx.lineTo(x + cw, Math.round(i) + 0.5)
-          ctx.stroke()
-        }
       } else {
         ctx.fillRect(x, y, cw, ch)
       }

@@ -21,7 +21,7 @@ export function detect(input: unknown): boolean {
   return Boolean(d && typeof d === 'object' && Array.isArray(d.conversation) && d.working_dir !== undefined)
 }
 
-export function parse(input: unknown, fileName: string, fileBytes: number): Session {
+export function parse(input: unknown, fileName: string): Session {
   const d = input as Rec
   const messages: Rec[] = d.conversation.filter((m: Rec) => m && Array.isArray(m.content))
   const startedAt = Date.parse(d.created_at) || (messages[0]?.created ?? 0) * 1000
@@ -145,7 +145,6 @@ export function parse(input: unknown, fileName: string, fileBytes: number): Sess
     costUsd: steps.reduce((a, s) => a + s.costUsd, 0) || d.accumulated_cost || 0,
     facts,
     fileName,
-    fileBytes,
   }
 }
 
