@@ -1,0 +1,1414 @@
+{
+  "id": "20260821_2",
+  "working_dir": "/Users/alexanderhancock/Development/goose-earth",
+  "name": "ThreeJS spinning Earth",
+  "user_set_name": false,
+  "session_type": "user",
+  "created_at": "2026-08-21T16:49:46Z",
+  "updated_at": "2026-08-21T16:55:07Z",
+  "extension_data": {
+    "enabled_extensions.v0": {
+      "extensions": [
+        {
+          "type": "platform",
+          "name": "apps",
+          "description": "Create and manage custom Goose apps through chat. Apps are HTML/CSS/JavaScript and run in sandboxed windows.",
+          "display_name": "Apps",
+          "bundled": true
+        },
+        {
+          "type": "platform",
+          "name": "developer",
+          "description": "Write and edit files, and execute shell commands",
+          "display_name": "Developer",
+          "bundled": true
+        },
+        {
+          "type": "platform",
+          "name": "todo",
+          "description": "Enable a todo list for goose so it can keep track of what it is doing",
+          "display_name": "Todo",
+          "bundled": true
+        },
+        {
+          "type": "platform",
+          "name": "analyze",
+          "description": "Analyze code structure with tree-sitter: directory overviews, file details, symbol call graphs",
+          "display_name": "Analyze",
+          "bundled": true
+        },
+        {
+          "type": "platform",
+          "name": "skills",
+          "description": "Discover and provide skill instructions from filesystem and builtins",
+          "display_name": "Skills",
+          "bundled": true
+        },
+        {
+          "type": "platform",
+          "name": "tom",
+          "description": "Inject custom context into every turn via GOOSE_MOIM_MESSAGE_TEXT and GOOSE_MOIM_MESSAGE_FILE environment variables",
+          "display_name": "Top Of Mind",
+          "bundled": true
+        },
+        {
+          "type": "platform",
+          "name": "Extension Manager",
+          "description": "Enable extension management tools for discovering, enabling, and disabling extensions",
+          "display_name": "Extension Manager",
+          "bundled": true
+        },
+        {
+          "type": "platform",
+          "name": "summon",
+          "description": "Load knowledge and delegate tasks to subagents",
+          "display_name": "Summon",
+          "bundled": true
+        }
+      ]
+    },
+    "todo.v0": {
+      "content": "Task: spinning Earth html — realistic textures applied\n\n- [x] Root cause found: unpkg 404s on examples/textures/ → silent procedural fallback\n- [x] Switched to jsDelivr gh mirror (mrdoob/three.js@r160), all 4 textures verified HTTP 200\n- [x] day/color + specular (ocean-only glint) + normal + clouds maps\n- [x] Added earth_lights_2048 night city lights via onBeforeCompile terminator blend\n- [x] OrbitControls with damping, ACES tone mapping, max anisotropy, 128x96 sphere\n- [x] Fresnel atmosphere, two-tier starfield, 23.4° tilt, resize handling\n- [x] Procedural fallback retained for offline\n- [x] Syntax checked, opened in browser (screenshot blocked by macOS perms)\n"
+    }
+  },
+  "usage": {
+    "input_tokens": 25994,
+    "output_tokens": 117,
+    "total_tokens": 26111,
+    "cache_read_input_tokens": 25905,
+    "cache_write_input_tokens": 87
+  },
+  "accumulated_usage": {
+    "input_tokens": 292293,
+    "output_tokens": 14366,
+    "total_tokens": 306659,
+    "cache_read_input_tokens": 266267,
+    "cache_write_input_tokens": 25992
+  },
+  "accumulated_cost": 0.6549035000000001,
+  "schedule_id": null,
+  "recipe": null,
+  "user_recipe_values": null,
+  "conversation": [
+    {
+      "id": "msg_9b0cf552-0aae-4455-b616-99e99dfa8995",
+      "role": "user",
+      "created": 1787330986,
+      "content": [
+        {
+          "type": "text",
+          "text": "Make a single html file that renders a spinning earth in the middle using ThreeJS. Black background"
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_ba4be166-6a6e-48b1-972b-55e17014fbfc",
+      "role": "user",
+      "created": 1787330986,
+      "content": [
+        {
+          "type": "text",
+          "text": "<turn-context>\n<current-time>2026-08-21 12:49:00 -04:00</current-time>\n<working-directory>/Users/alexanderhancock/Development/goose-earth</working-directory>\n\nCurrent tasks and notes:\nOnce given a task, immediately update your todo with all explicit and implicit requirements\n\n</turn-context>"
+        }
+      ],
+      "metadata": {
+        "userVisible": false,
+        "agentVisible": true,
+        "turnContext": true
+      }
+    },
+    {
+      "id": "msg_011CeGEigxgfzapPdcSBXbEH",
+      "role": "assistant",
+      "created": 1787330994,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_01NDUUgjZRuESZyBgshzBYg5",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_write",
+              "arguments": {
+                "content": "Task: single HTML file, spinning Earth (ThreeJS), black background\n\n- [ ] Single self-contained .html file (no build step)\n- [ ] Three.js loaded from CDN (ESM importmap)\n- [ ] Black background\n- [ ] Earth sphere centered, textured, auto-rotating\n- [ ] Lighting (sun-like directional + subtle ambient)\n- [ ] Nice-to-haves: clouds layer, atmosphere glow, starfield, mouse drag, resize handling\n- [ ] Graceful fallback if texture CDN fails (procedural texture)\n- [ ] Verify file opens / no syntax errors\n"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "todo"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 7006,
+          "outputTokens": 567,
+          "totalTokens": 7573,
+          "cacheReadTokens": 0,
+          "cacheWriteTokens": 7004,
+          "cost": 0.05796,
+          "costSource": "estimated",
+          "elapsedMs": 8705,
+          "timeToFirstTokenMs": 8700
+        }
+      }
+    },
+    {
+      "id": "msg_d30c0728-12c9-4492-ba91-b418e8fab6fe",
+      "role": "user",
+      "created": 1787330994,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_01NDUUgjZRuESZyBgshzBYg5",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated (501 chars)"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGEjKSQYDqP3nYk55iP3",
+      "role": "assistant",
+      "created": 1787331031,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_01EEKr4rPETwfgMXNqoxicJU",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "write",
+              "arguments": {
+                "path": "/Users/alexanderhancock/Development/goose-earth/earth.html",
+                "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n<title>Spinning Earth</title>\n<style>\n  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }\n  canvas { display: block; }\n  #hint {\n    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);\n    font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;\n    color: rgba(255,255,255,.35); letter-spacing: .08em; text-transform: uppercase;\n    pointer-events: none; user-select: none; transition: opacity .6s ease;\n  }\n</style>\n</head>\n<body>\n<div id=\"hint\">drag to rotate &middot; scroll to zoom</div>\n\n<script type=\"importmap\">\n{ \"imports\": { \"three\": \"https://unpkg.com/three@0.160.0/build/three.module.js\" } }\n</script>\n\n<script type=\"module\">\nimport * as THREE from 'three';\n\nconst TEX = 'https://unpkg.com/three@0.160.0/examples/textures/planets/';\n\n// ---------- renderer / scene / camera ----------\nconst renderer = new THREE.WebGLRenderer({ antialias: true });\nrenderer.setPixelRatio(Math.min(devicePixelRatio, 2));\nrenderer.setSize(innerWidth, innerHeight);\nrenderer.toneMapping = THREE.ACESFilmicToneMapping;\nrenderer.toneMappingExposure = 1.1;\ndocument.body.appendChild(renderer.domElement);\n\nconst scene = new THREE.Scene();\nscene.background = new THREE.Color(0x000000);\n\nconst camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 2000);\ncamera.position.set(0, 0.6, 4.2);\n\n// ---------- lights ----------\nscene.add(new THREE.AmbientLight(0x0a1832, 1.2));\nconst sun = new THREE.DirectionalLight(0xfff4e6, 3.0);\nsun.position.set(5, 2, 3);\nscene.add(sun);\n\n// ---------- starfield ----------\n(function stars() {\n  const N = 3500, pos = new Float32Array(N * 3), col = new Float32Array(N * 3);\n  const c = new THREE.Color();\n  for (let i = 0; i < N; i++) {\n    // random point on a large sphere\n    const u = Math.random() * 2 - 1, t = Math.random() * Math.PI * 2, r = 300 + Math.random() * 500;\n    const s = Math.sqrt(1 - u * u);\n    pos.set([Math.cos(t) * s * r, u * r, Math.sin(t) * s * r], i * 3);\n    c.setHSL(0.55 + Math.random() * 0.12, 0.35, 0.55 + Math.random() * 0.45);\n    col.set([c.r, c.g, c.b], i * 3);\n  }\n  const g = new THREE.BufferGeometry();\n  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));\n  g.setAttribute('color', new THREE.BufferAttribute(col, 3));\n  scene.add(new THREE.Points(g, new THREE.PointsMaterial({\n    size: 1.6, sizeAttenuation: true, vertexColors: true, transparent: true, opacity: 0.9\n  })));\n})();\n\n// ---------- earth ----------\nconst world = new THREE.Group();      // holds earth + clouds, tilted\nworld.rotation.z = THREE.MathUtils.degToRad(23.4);\nscene.add(world);\n\nconst loader = new THREE.TextureLoader();\nloader.setCrossOrigin('anonymous');\n\n// procedural fallback so it still looks like a planet if the CDN textures fail\nfunction fallbackTexture() {\n  const c = document.createElement('canvas');\n  c.width = 1024; c.height = 512;\n  const x = c.getContext('2d');\n  x.fillStyle = '#0b2a52'; x.fillRect(0, 0, c.width, c.height);\n  for (let i = 0; i < 900; i++) {\n    const px = Math.random() * c.width, py = Math.random() * c.height;\n    const r = 8 + Math.random() * 55;\n    const lat = Math.abs(py / c.height - 0.5) * 2;\n    x.fillStyle = lat > 0.86 ? 'rgba(240,248,255,.75)'\n                : `rgba(${40 + Math.random() * 40},${95 + Math.random() * 60},${45 + Math.random() * 30},.5)`;\n    x.beginPath(); x.ellipse(px, py, r, r * 0.6, 0, 0, Math.PI * 2); x.fill();\n  }\n  const t = new THREE.CanvasTexture(c);\n  t.colorSpace = THREE.SRGBColorSpace;\n  return t;\n}\n\nfunction load(file, srgb) {\n  return loader.load(\n    TEX + file,\n    t => { if (srgb) t.colorSpace = THREE.SRGBColorSpace; },\n    undefined,\n    () => { if (srgb) earth.material.map = fallbackTexture(), earth.material.needsUpdate = true; }\n  );\n}\n\nconst earth = new THREE.Mesh(\n  new THREE.SphereGeometry(1, 96, 96),\n  new THREE.MeshPhongMaterial({\n    map: load('earth_atmos_2048.jpg', true),\n    specularMap: load('earth_specular_2048.jpg', false),\n    normalMap: load('earth_normal_2048.jpg', false),\n    normalScale: new THREE.Vector2(0.85, 0.85),\n    specular: new THREE.Color(0x2b3a4a),\n    shininess: 18\n  })\n);\nworld.add(earth);\n\nconst clouds = new THREE.Mesh(\n  new THREE.SphereGeometry(1.006, 64, 64),\n  new THREE.MeshLambertMaterial({\n    map: load('earth_clouds_1024.png', true),\n    transparent: true, opacity: 0.5, depthWrite: false\n  })\n);\nworld.add(clouds);\n\n// ---------- atmosphere (fresnel rim glow) ----------\nconst atmosphere = new THREE.Mesh(\n  new THREE.SphereGeometry(1.14, 64, 64),\n  new THREE.ShaderMaterial({\n    transparent: true, side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending,\n    uniforms: { uSun: { value: sun.position.clone().normalize() } },\n    vertexShader: `\n      varying vec3 vN; varying vec3 vP;\n      void main() {\n        vN = normalize(normalMatrix * normal);\n        vec4 mv = modelViewMatrix * vec4(position, 1.0);\n        vP = mv.xyz;\n        gl_Position = projectionMatrix * mv;\n      }`,\n    fragmentShader: `\n      varying vec3 vN; varying vec3 vP;\n      uniform vec3 uSun;\n      void main() {\n        float rim = pow(1.0 - abs(dot(normalize(vN), normalize(-vP))), 3.0);\n        float lit = clamp(dot(normalize(vN), normalize(uSun)) * 0.5 + 0.65, 0.0, 1.0);\n        vec3 col = mix(vec3(0.15, 0.4, 1.0), vec3(0.45, 0.75, 1.0), rim);\n        gl_FragColor = vec4(col * rim * lit * 1.5, rim);\n      }`\n  })\n);\nscene.add(atmosphere);\n\n// ---------- interaction: drag to rotate, scroll to zoom ----------\nlet dragging = false, px = 0, py = 0;\nlet yaw = 0, pitch = 0, spin = 0, dist = camera.position.length();\nconst hint = document.getElementById('hint');\n\nrenderer.domElement.addEventListener('pointerdown', e => {\n  dragging = true; px = e.clientX; py = e.clientY;\n  renderer.domElement.setPointerCapture(e.pointerId);\n  hint.style.opacity = 0;\n});\naddEventListener('pointerup', () => dragging = false);\naddEventListener('pointermove', e => {\n  if (!dragging) return;\n  yaw += (e.clientX - px) * 0.005;\n  pitch = THREE.MathUtils.clamp(pitch + (e.clientY - py) * 0.005, -1.2, 1.2);\n  px = e.clientX; py = e.clientY;\n});\naddEventListener('wheel', e => {\n  dist = THREE.MathUtils.clamp(dist * (1 + Math.sign(e.deltaY) * 0.08), 1.7, 12);\n}, { passive: true });\n\naddEventListener('resize', () => {\n  camera.aspect = innerWidth / innerHeight;\n  camera.updateProjectionMatrix();\n  renderer.setSize(innerWidth, innerHeight);\n});\n\n// ---------- loop ----------\nconst clock = new THREE.Clock();\nrenderer.setAnimationLoop(() => {\n  const dt = clock.getDelta();\n  spin += dt * 0.12;                       // constant, gentle rotation\n  earth.rotation.y = spin + yaw;\n  clouds.rotation.y = spin * 1.15 + yaw;\n\n  const p = pitch;\n  camera.position.set(\n    Math.sin(0) * dist,\n    Math.sin(p) * dist,\n    Math.cos(p) * dist\n  );\n  camera.lookAt(0, 0, 0);\n\n  atmosphere.material.uniforms.uSun.value.copy(sun.position).normalize();\n  renderer.render(scene, camera);\n});\n</script>\n</body>\n</html>\n"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "developer"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 7289,
+          "outputTokens": 3711,
+          "totalTokens": 11000,
+          "cacheReadTokens": 7004,
+          "cacheWriteTokens": 283,
+          "cost": 0.09805575,
+          "costSource": "estimated",
+          "elapsedMs": 36254,
+          "timeToFirstTokenMs": 36240
+        }
+      }
+    },
+    {
+      "id": "msg_f21d0b86-6d93-4afb-988d-769bacc165d8",
+      "role": "user",
+      "created": 1787331031,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_01EEKr4rPETwfgMXNqoxicJU",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Created /Users/alexanderhancock/Development/goose-earth/earth.html (203 lines)",
+                  "annotations": {
+                    "priority": 0.0
+                  }
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGEmztXmAmnKcSnCbYpG",
+      "role": "assistant",
+      "created": 1787331036,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_01VDd7zA6NTwA7sgA2V4YryB",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "shell",
+              "arguments": {
+                "command": "cd /Users/alexanderhancock/Development/goose-earth && node --input-type=module -e \"\nconst html = require('fs').readFileSync('earth.html','utf8');\nconst m = [...html.matchAll(/<script type=\\\"module\\\">([\\s\\S]*?)<\\/script>/g)];\nconst code = m[0][1].replace(/^import .*$/m,'');\nnew Function(code); console.log('JS parses OK');\n\" 2>&1 | tail -3; open earth.html"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "developer"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 10815,
+          "outputTokens": 204,
+          "totalTokens": 11019,
+          "cacheReadTokens": 7287,
+          "cacheWriteTokens": 3526,
+          "cost": 0.030791,
+          "costSource": "estimated",
+          "elapsedMs": 5753,
+          "timeToFirstTokenMs": 5507
+        }
+      }
+    },
+    {
+      "id": "msg_6ee1d0ee-6551-4501-8423-633ae9303d55",
+      "role": "user",
+      "created": 1787331036,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_01VDd7zA6NTwA7sgA2V4YryB",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)\n\nNode.js v26.7.0",
+                  "annotations": {
+                    "priority": 0.0
+                  }
+                }
+              ],
+              "structuredContent": {
+                "stdout": "    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)\n\nNode.js v26.7.0",
+                "stderr": "",
+                "exit_code": 0
+              },
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGEnSE2M8Etf9pd3jeXf",
+      "role": "assistant",
+      "created": 1787331041,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_01TAzK7zqfeRBTkgFh7poriB",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "shell",
+              "arguments": {
+                "command": "cd /Users/alexanderhancock/Development/goose-earth && node -e \"\nconst fs=require('fs');\nconst html=fs.readFileSync('earth.html','utf8');\nconst code=html.match(/<script type=\\\"module\\\">([\\s\\S]*?)<\\/script>/)[1];\nfs.writeFileSync('/tmp/_check.mjs',code.replace(/from 'three'/,\\\"from 'node:util'\\\"));\n\" && node --check /tmp/_check.mjs && echo \"JS parses OK\" && rm /tmp/_check.mjs"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "developer"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 11072,
+          "outputTokens": 260,
+          "totalTokens": 11332,
+          "cacheReadTokens": 10813,
+          "cacheWriteTokens": 257,
+          "cost": 0.01352275,
+          "costSource": "estimated",
+          "elapsedMs": 4779,
+          "timeToFirstTokenMs": 4649
+        }
+      }
+    },
+    {
+      "id": "msg_a480f98e-3107-47de-a2c1-b7ef56616ba8",
+      "role": "user",
+      "created": 1787331041,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_01TAzK7zqfeRBTkgFh7poriB",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "JS parses OK",
+                  "annotations": {
+                    "priority": 0.0
+                  }
+                }
+              ],
+              "structuredContent": {
+                "stdout": "JS parses OK",
+                "stderr": "",
+                "exit_code": 0
+              },
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGEnmPwooFi11xBnTbye",
+      "role": "assistant",
+      "created": 1787331046,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_019atBYsWuCRVZuMW7rKbnNz",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_write",
+              "arguments": {
+                "content": "Task: single HTML file, spinning Earth (ThreeJS), black background — DONE\n\n- [x] Single self-contained .html file (earth.html)\n- [x] Three.js via CDN importmap (r160)\n- [x] Black background\n- [x] Textured Earth centered, auto-rotating, 23.4° tilt\n- [x] Directional sun + ambient light\n- [x] Clouds layer, fresnel atmosphere glow, starfield\n- [x] Drag to rotate, scroll to zoom, resize handling\n- [x] Procedural fallback texture if CDN fails\n- [x] Syntax verified with node --check; opened in browser\n"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "todo"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 11314,
+          "outputTokens": 265,
+          "totalTokens": 11579,
+          "cacheReadTokens": 11070,
+          "cacheWriteTokens": 242,
+          "cost": 0.0136825,
+          "costSource": "estimated",
+          "elapsedMs": 4699,
+          "timeToFirstTokenMs": 4695
+        }
+      }
+    },
+    {
+      "id": "msg_6ef43974-ccf9-4a24-843d-6ac820fd8f01",
+      "role": "user",
+      "created": 1787331046,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_019atBYsWuCRVZuMW7rKbnNz",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated (500 chars)"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGEo7Vg4xpnC1aLKQMEM",
+      "role": "assistant",
+      "created": 1787331047,
+      "content": [
+        {
+          "type": "text",
+          "text": "Created **`/Users/alexanderhancock/Development/goose-earth/earth.html`** and opened it in your browser.\n\nWhat's in it:\n- **Three.js r160** loaded via an ESM importmap from unpkg — no build step, just open the file.\n- **Black background**, centered Earth sphere with color, specular, and normal maps (so oceans glint and terrain has relief).\n- **23.4° axial tilt**, slow constant spin; a separate translucent **cloud layer** rotates slightly faster.\n- **Fresnel atmosphere shader** for a blue rim glow, additive-blended and sun-aware.\n- **3,500-point starfield** with subtle color variation.\n- **Interaction**: drag to rotate, scroll to zoom, window resize handled. ACES tone mapping for a nicer look.\n- **Fallback**: if the texture CDN is blocked, a procedural canvas planet texture kicks in so it still renders as a planet.\n\nWant it fully offline (textures embedded/procedural only), or a different look — night-lights city glow, no interaction, faster spin?"
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 11593,
+          "outputTokens": 360,
+          "totalTokens": 11953,
+          "cacheReadTokens": 11312,
+          "cacheWriteTokens": 279,
+          "cost": 0.01640975,
+          "costSource": "estimated",
+          "elapsedMs": 6541,
+          "timeToFirstTokenMs": 1422
+        }
+      }
+    },
+    {
+      "id": "msg_86874485-d14d-49ea-a3a4-440eab67387f",
+      "role": "user",
+      "created": 1787331183,
+      "content": [
+        {
+          "type": "text",
+          "text": "Apply a more realistic earth texture, like this file did /Users/alexanderhancock/Development/earth.html"
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_0ff59650-91a8-47a0-ad70-d011009ddfa0",
+      "role": "user",
+      "created": 1787331183,
+      "content": [
+        {
+          "type": "text",
+          "text": "<turn-context>\n<current-time>2026-08-21 12:53:00 -04:00</current-time>\n<working-directory>/Users/alexanderhancock/Development/goose-earth</working-directory>\n\nCurrent tasks and notes:\nTask: single HTML file, spinning Earth (ThreeJS), black background — DONE\n\n- [x] Single self-contained .html file (earth.html)\n- [x] Three.js via CDN importmap (r160)\n- [x] Black background\n- [x] Textured Earth centered, auto-rotating, 23.4° tilt\n- [x] Directional sun + ambient light\n- [x] Clouds layer, fresnel atmosphere glow, starfield\n- [x] Drag to rotate, scroll to zoom, resize handling\n- [x] Procedural fallback texture if CDN fails\n- [x] Syntax verified with node --check; opened in browser\n\n\n</turn-context>"
+        }
+      ],
+      "metadata": {
+        "userVisible": false,
+        "agentVisible": true,
+        "turnContext": true
+      }
+    },
+    {
+      "id": "msg_011CeGEyEX8MXdSM7EEPYAwT",
+      "role": "assistant",
+      "created": 1787331185,
+      "content": [
+        {
+          "type": "text",
+          "text": "I'll look at that reference file to see what textures it uses."
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 12290,
+          "outputTokens": 116,
+          "totalTokens": 12406,
+          "cacheReadTokens": 11591,
+          "cacheWriteTokens": 697,
+          "cost": 0.01306175,
+          "costSource": "estimated",
+          "elapsedMs": 3166,
+          "timeToFirstTokenMs": 1700
+        }
+      }
+    },
+    {
+      "id": "msg_13f0a045-2795-4599-941d-4c726cd5a17b",
+      "role": "assistant",
+      "created": 1787331186,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_016rWcnpLegpGrAXWNWDoN6g",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "shell",
+              "arguments": {
+                "command": "cd /Users/alexanderhancock/Development && wc -l earth.html && grep -nEi \"http|texture|load\\(|map\" earth.html | head -60"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "developer"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        }
+      }
+    },
+    {
+      "id": "msg_41aa1b4b-9e4d-4899-8efa-012c6efb9a88",
+      "role": "user",
+      "created": 1787331186,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_016rWcnpLegpGrAXWNWDoN6g",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "     316 earth.html\n21:<script type=\"importmap\">\n24:    \"three\": \"https://unpkg.com/three@0.160.0/build/three.module.js\",\n25:    \"three/addons/\": \"https://unpkg.com/three@0.160.0/examples/jsm/\"\n34:const TEX = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/';\n69:// ------------------------------------------------------------------- textures\n70:const loader = new THREE.TextureLoader();\n73:function load(file, colorSpace, onFail) {\n74:  return loader.load(\n83:// the globe still looks like a globe when the texture CDN is unreachable.\n163:  const tex = new THREE.CanvasTexture(c);\n176:  map: load('earth_atmos_2048.jpg', THREE.SRGBColorSpace, () => {\n177:    earthMat.map = proceduralEarth();\n178:    earthMat.specularMap = null;\n179:    earthMat.normalMap = null;\n182:  specularMap: load('earth_specular_2048.jpg'),\n183:  normalMap: load('earth_normal_2048.jpg'),\n194:  map: load('earth_clouds_1024.png', THREE.SRGBColorSpace, () => {",
+                  "annotations": {
+                    "priority": 0.0
+                  }
+                }
+              ],
+              "structuredContent": {
+                "stdout": "     316 earth.html\n21:<script type=\"importmap\">\n24:    \"three\": \"https://unpkg.com/three@0.160.0/build/three.module.js\",\n25:    \"three/addons/\": \"https://unpkg.com/three@0.160.0/examples/jsm/\"\n34:const TEX = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/';\n69:// ------------------------------------------------------------------- textures\n70:const loader = new THREE.TextureLoader();\n73:function load(file, colorSpace, onFail) {\n74:  return loader.load(\n83:// the globe still looks like a globe when the texture CDN is unreachable.\n163:  const tex = new THREE.CanvasTexture(c);\n176:  map: load('earth_atmos_2048.jpg', THREE.SRGBColorSpace, () => {\n177:    earthMat.map = proceduralEarth();\n178:    earthMat.specularMap = null;\n179:    earthMat.normalMap = null;\n182:  specularMap: load('earth_specular_2048.jpg'),\n183:  normalMap: load('earth_normal_2048.jpg'),\n194:  map: load('earth_clouds_1024.png', THREE.SRGBColorSpace, () => {",
+                "stderr": "",
+                "exit_code": 0
+              },
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGEyTmMhstzpk8zZHTLc",
+      "role": "assistant",
+      "created": 1787331190,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_01K78Hrp9pgJMCbDGUzia7ad",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "shell",
+              "arguments": {
+                "command": "cd /Users/alexanderhancock/Development && sed -n 30,240p earth.html"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "developer"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 12844,
+          "outputTokens": 192,
+          "totalTokens": 13036,
+          "cacheReadTokens": 12288,
+          "cacheWriteTokens": 554,
+          "cost": 0.0144165,
+          "costSource": "estimated",
+          "elapsedMs": 3627,
+          "timeToFirstTokenMs": 3605
+        }
+      }
+    },
+    {
+      "id": "msg_f4a960cd-7003-4b9a-a8cc-ad92336034b2",
+      "role": "user",
+      "created": 1787331190,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_01K78Hrp9pgJMCbDGUzia7ad",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "<script type=\"module\">\nimport * as THREE from 'three';\nimport { OrbitControls } from 'three/addons/controls/OrbitControls.js';\n\nconst TEX = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/';\n\n// ---------------------------------------------------------------- scene setup\nconst renderer = new THREE.WebGLRenderer({ antialias: true });\nrenderer.setPixelRatio(Math.min(devicePixelRatio, 2));\nrenderer.setSize(innerWidth, innerHeight);\nrenderer.outputColorSpace = THREE.SRGBColorSpace;\ndocument.body.appendChild(renderer.domElement);\n\nconst scene = new THREE.Scene();\nscene.background = new THREE.Color(0x000000);\n\nconst camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 2000);\ncamera.position.set(0, 0.9, 4.2);\n\nconst controls = new OrbitControls(camera, renderer.domElement);\ncontrols.enableDamping = true;\ncontrols.dampingFactor = 0.06;\ncontrols.rotateSpeed = 0.45;\ncontrols.minDistance = 1.6;\ncontrols.maxDistance = 12;\ncontrols.enablePan = false;\n\n// ------------------------------------------------------------------- lighting\nscene.add(new THREE.AmbientLight(0xffffff, 0.06));\n\nconst sun = new THREE.DirectionalLight(0xfff4e8, 2.6);\nsun.position.set(5, 2, 3);\nscene.add(sun);\n\n// cool bounce light so the night side reads as a silhouette, not a void\nconst fill = new THREE.DirectionalLight(0x2a4a7a, 0.35);\nfill.position.set(-4, -1, -3);\nscene.add(fill);\n\n// ------------------------------------------------------------------- textures\nconst loader = new THREE.TextureLoader();\nloader.setCrossOrigin('anonymous');\n\nfunction load(file, colorSpace, onFail) {\n  return loader.load(\n    TEX + file,\n    t => { if (colorSpace) t.colorSpace = colorSpace; },\n    undefined,\n    () => onFail && onFail()\n  );\n}\n\n// Offline fallback: paint a plausible world on a canvas with value noise, so\n// the globe still looks like a globe when the texture CDN is unreachable.\nfunction proceduralEarth() {\n  const w = 1024, h = 512;\n  const c = document.createElement('canvas');\n  c.width = w; c.height = h;\n  const ctx = c.getContext('2d');\n\n  const ocean = ctx.createLinearGradient(0, 0, 0, h);\n  ocean.addColorStop(0.00, '#0b2a4a');\n  ocean.addColorStop(0.50, '#10406e');\n  ocean.addColorStop(1.00, '#0b2a4a');\n  ctx.fillStyle = ocean;\n  ctx.fillRect(0, 0, w, h);\n\n  const perm = new Uint8Array(512);\n  for (let i = 0; i < 256; i++) perm[i] = i;\n  for (let i = 255; i > 0; i--) {\n    const j = (Math.random() * (i + 1)) | 0;\n    [perm[i], perm[j]] = [perm[j], perm[i]];\n  }\n  for (let i = 0; i < 256; i++) perm[i + 256] = perm[i];\n\n  const fade = t => t * t * t * (t * (t * 6 - 15) + 10);\n  const grad = (hash, x, y) => {\n    const u = (hash & 1) ? x : -x;\n    const v = (hash & 2) ? y : -y;\n    return u + v;\n  };\n  const noise = (x, y) => {\n    const X = Math.floor(x) & 255, Y = Math.floor(y) & 255;\n    x -= Math.floor(x); y -= Math.floor(y);\n    const u = fade(x), v = fade(y);\n    const a = perm[X] + Y, b = perm[X + 1] + Y;\n    return THREE.MathUtils.lerp(\n      THREE.MathUtils.lerp(grad(perm[a], x, y),     grad(perm[b], x - 1, y),     u),\n      THREE.MathUtils.lerp(grad(perm[a + 1], x, y - 1), grad(perm[b + 1], x - 1, y - 1), u),\n      v\n    );\n  };\n  const fbm = (x, y) => {\n    let sum = 0, amp = 0.5, freq = 1;\n    for (let o = 0; o < 5; o++) {\n      sum += noise(x * freq, y * freq) * amp;\n      amp *= 0.5; freq *= 2;\n    }\n    return sum;\n  };\n\n  const img = ctx.getImageData(0, 0, w, h);\n  const px = img.data;\n  for (let y = 0; y < h; y++) {\n    const lat = (y / h - 0.5) * Math.PI;         // -pi/2 .. pi/2\n    for (let x = 0; x < w; x++) {\n      const lon = (x / w) * Math.PI * 2;\n      // sample noise on the sphere so the seam at lon 0/2pi matches up\n      const nx = Math.cos(lon) * Math.cos(lat) * 2.2;\n      const ny = Math.sin(lon) * Math.cos(lat) * 2.2;\n      const n = fbm(nx + 11.3, ny + 4.7) + fbm(nx * 2.7 - 3.1, ny * 2.7 + 9.4) * 0.35;\n      const i = (y * w + x) * 4;\n\n      if (n > 0.06) {\n        const elev = Math.min(1, (n - 0.06) * 2.4);\n        const cold = Math.min(1, Math.max(0, (Math.abs(lat) - 0.95) * 2.6));\n        const dry  = Math.max(0, 1 - Math.abs(Math.abs(lat) - 0.42) * 5);\n        let r = 46 + elev * 120 + dry * 80;\n        let g = 84 + elev * 78  - dry * 10;\n        let b = 38 + elev * 62  - dry * 10;\n        r = THREE.MathUtils.lerp(r, 236, cold);\n        g = THREE.MathUtils.lerp(g, 240, cold);\n        b = THREE.MathUtils.lerp(b, 246, cold);\n        px[i] = r; px[i + 1] = g; px[i + 2] = b;\n      } else if (n > 0.02) {                      // shallow shelf\n        px[i]     = 30 + n * 120;\n        px[i + 1] = 96 + n * 120;\n        px[i + 2] = 140;\n      }\n    }\n  }\n  ctx.putImageData(img, 0, 0);\n\n  const tex = new THREE.CanvasTexture(c);\n  tex.colorSpace = THREE.SRGBColorSpace;\n  tex.wrapS = THREE.RepeatWrapping;\n  return tex;\n}\n\n// ---------------------------------------------------------------------- earth\nconst RADIUS = 1;\nconst tilt = new THREE.Group();\ntilt.rotation.z = THREE.MathUtils.degToRad(23.4);\nscene.add(tilt);\n\nconst earthMat = new THREE.MeshPhongMaterial({\n  map: load('earth_atmos_2048.jpg', THREE.SRGBColorSpace, () => {\n    earthMat.map = proceduralEarth();\n    earthMat.specularMap = null;\n    earthMat.normalMap = null;\n    earthMat.needsUpdate = true;\n  }),\n  specularMap: load('earth_specular_2048.jpg'),\n  normalMap: load('earth_normal_2048.jpg'),\n  normalScale: new THREE.Vector2(0.85, 0.85),\n  specular: new THREE.Color(0x2b3f57),\n  shininess: 18\n});\n\nconst earth = new THREE.Mesh(new THREE.SphereGeometry(RADIUS, 96, 64), earthMat);\ntilt.add(earth);\n\n// ---------------------------------------------------------------------- clouds\nconst cloudMat = new THREE.MeshPhongMaterial({\n  map: load('earth_clouds_1024.png', THREE.SRGBColorSpace, () => {\n    clouds.visible = false;\n  }),\n  transparent: true,\n  opacity: 0.45,\n  depthWrite: false,\n  blending: THREE.NormalBlending\n});\nconst clouds = new THREE.Mesh(new THREE.SphereGeometry(RADIUS * 1.012, 96, 64), cloudMat);\ntilt.add(clouds);\n\n// ----------------------------------------------------------------- atmosphere\n// Backside shell with a fresnel falloff — cheap, convincing limb glow.\nconst atmosphere = new THREE.Mesh(\n  new THREE.SphereGeometry(RADIUS * 1.16, 96, 64),\n  new THREE.ShaderMaterial({\n    transparent: true,\n    side: THREE.BackSide,\n    blending: THREE.AdditiveBlending,\n    depthWrite: false,\n    uniforms: { uSun: { value: sun.position.clone().normalize() } },\n    vertexShader: `\n      varying vec3 vNormal;\n      varying vec3 vWorldNormal;\n      void main() {\n        vNormal = normalize(normalMatrix * normal);\n        vWorldNormal = normalize(mat3(modelMatrix) * normal);\n        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n      }\n    `,\n    fragmentShader: `\n      uniform vec3 uSun;\n      varying vec3 vNormal;\n      varying vec3 vWorldNormal;\n      void main() {\n        float rim = pow(clamp(1.0 - abs(vNormal.z), 0.0, 1.0), 3.2);\n        float lit = smoothstep(-0.45, 0.55, dot(vWorldNormal, uSun));\n        vec3 col = mix(vec3(0.16, 0.36, 0.85), vec3(0.45, 0.68, 1.0), lit);\n        gl_FragColor = vec4(col, rim * (0.18 + lit * 0.85));\n      }\n    `\n  })\n);\nscene.add(atmosphere);\n\n// ------------------------------------------------------------------ starfield\nfunction makeStars(count, spread) {",
+                  "annotations": {
+                    "priority": 0.0
+                  }
+                }
+              ],
+              "structuredContent": {
+                "stdout": "<script type=\"module\">\nimport * as THREE from 'three';\nimport { OrbitControls } from 'three/addons/controls/OrbitControls.js';\n\nconst TEX = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/';\n\n// ---------------------------------------------------------------- scene setup\nconst renderer = new THREE.WebGLRenderer({ antialias: true });\nrenderer.setPixelRatio(Math.min(devicePixelRatio, 2));\nrenderer.setSize(innerWidth, innerHeight);\nrenderer.outputColorSpace = THREE.SRGBColorSpace;\ndocument.body.appendChild(renderer.domElement);\n\nconst scene = new THREE.Scene();\nscene.background = new THREE.Color(0x000000);\n\nconst camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 2000);\ncamera.position.set(0, 0.9, 4.2);\n\nconst controls = new OrbitControls(camera, renderer.domElement);\ncontrols.enableDamping = true;\ncontrols.dampingFactor = 0.06;\ncontrols.rotateSpeed = 0.45;\ncontrols.minDistance = 1.6;\ncontrols.maxDistance = 12;\ncontrols.enablePan = false;\n\n// ------------------------------------------------------------------- lighting\nscene.add(new THREE.AmbientLight(0xffffff, 0.06));\n\nconst sun = new THREE.DirectionalLight(0xfff4e8, 2.6);\nsun.position.set(5, 2, 3);\nscene.add(sun);\n\n// cool bounce light so the night side reads as a silhouette, not a void\nconst fill = new THREE.DirectionalLight(0x2a4a7a, 0.35);\nfill.position.set(-4, -1, -3);\nscene.add(fill);\n\n// ------------------------------------------------------------------- textures\nconst loader = new THREE.TextureLoader();\nloader.setCrossOrigin('anonymous');\n\nfunction load(file, colorSpace, onFail) {\n  return loader.load(\n    TEX + file,\n    t => { if (colorSpace) t.colorSpace = colorSpace; },\n    undefined,\n    () => onFail && onFail()\n  );\n}\n\n// Offline fallback: paint a plausible world on a canvas with value noise, so\n// the globe still looks like a globe when the texture CDN is unreachable.\nfunction proceduralEarth() {\n  const w = 1024, h = 512;\n  const c = document.createElement('canvas');\n  c.width = w; c.height = h;\n  const ctx = c.getContext('2d');\n\n  const ocean = ctx.createLinearGradient(0, 0, 0, h);\n  ocean.addColorStop(0.00, '#0b2a4a');\n  ocean.addColorStop(0.50, '#10406e');\n  ocean.addColorStop(1.00, '#0b2a4a');\n  ctx.fillStyle = ocean;\n  ctx.fillRect(0, 0, w, h);\n\n  const perm = new Uint8Array(512);\n  for (let i = 0; i < 256; i++) perm[i] = i;\n  for (let i = 255; i > 0; i--) {\n    const j = (Math.random() * (i + 1)) | 0;\n    [perm[i], perm[j]] = [perm[j], perm[i]];\n  }\n  for (let i = 0; i < 256; i++) perm[i + 256] = perm[i];\n\n  const fade = t => t * t * t * (t * (t * 6 - 15) + 10);\n  const grad = (hash, x, y) => {\n    const u = (hash & 1) ? x : -x;\n    const v = (hash & 2) ? y : -y;\n    return u + v;\n  };\n  const noise = (x, y) => {\n    const X = Math.floor(x) & 255, Y = Math.floor(y) & 255;\n    x -= Math.floor(x); y -= Math.floor(y);\n    const u = fade(x), v = fade(y);\n    const a = perm[X] + Y, b = perm[X + 1] + Y;\n    return THREE.MathUtils.lerp(\n      THREE.MathUtils.lerp(grad(perm[a], x, y),     grad(perm[b], x - 1, y),     u),\n      THREE.MathUtils.lerp(grad(perm[a + 1], x, y - 1), grad(perm[b + 1], x - 1, y - 1), u),\n      v\n    );\n  };\n  const fbm = (x, y) => {\n    let sum = 0, amp = 0.5, freq = 1;\n    for (let o = 0; o < 5; o++) {\n      sum += noise(x * freq, y * freq) * amp;\n      amp *= 0.5; freq *= 2;\n    }\n    return sum;\n  };\n\n  const img = ctx.getImageData(0, 0, w, h);\n  const px = img.data;\n  for (let y = 0; y < h; y++) {\n    const lat = (y / h - 0.5) * Math.PI;         // -pi/2 .. pi/2\n    for (let x = 0; x < w; x++) {\n      const lon = (x / w) * Math.PI * 2;\n      // sample noise on the sphere so the seam at lon 0/2pi matches up\n      const nx = Math.cos(lon) * Math.cos(lat) * 2.2;\n      const ny = Math.sin(lon) * Math.cos(lat) * 2.2;\n      const n = fbm(nx + 11.3, ny + 4.7) + fbm(nx * 2.7 - 3.1, ny * 2.7 + 9.4) * 0.35;\n      const i = (y * w + x) * 4;\n\n      if (n > 0.06) {\n        const elev = Math.min(1, (n - 0.06) * 2.4);\n        const cold = Math.min(1, Math.max(0, (Math.abs(lat) - 0.95) * 2.6));\n        const dry  = Math.max(0, 1 - Math.abs(Math.abs(lat) - 0.42) * 5);\n        let r = 46 + elev * 120 + dry * 80;\n        let g = 84 + elev * 78  - dry * 10;\n        let b = 38 + elev * 62  - dry * 10;\n        r = THREE.MathUtils.lerp(r, 236, cold);\n        g = THREE.MathUtils.lerp(g, 240, cold);\n        b = THREE.MathUtils.lerp(b, 246, cold);\n        px[i] = r; px[i + 1] = g; px[i + 2] = b;\n      } else if (n > 0.02) {                      // shallow shelf\n        px[i]     = 30 + n * 120;\n        px[i + 1] = 96 + n * 120;\n        px[i + 2] = 140;\n      }\n    }\n  }\n  ctx.putImageData(img, 0, 0);\n\n  const tex = new THREE.CanvasTexture(c);\n  tex.colorSpace = THREE.SRGBColorSpace;\n  tex.wrapS = THREE.RepeatWrapping;\n  return tex;\n}\n\n// ---------------------------------------------------------------------- earth\nconst RADIUS = 1;\nconst tilt = new THREE.Group();\ntilt.rotation.z = THREE.MathUtils.degToRad(23.4);\nscene.add(tilt);\n\nconst earthMat = new THREE.MeshPhongMaterial({\n  map: load('earth_atmos_2048.jpg', THREE.SRGBColorSpace, () => {\n    earthMat.map = proceduralEarth();\n    earthMat.specularMap = null;\n    earthMat.normalMap = null;\n    earthMat.needsUpdate = true;\n  }),\n  specularMap: load('earth_specular_2048.jpg'),\n  normalMap: load('earth_normal_2048.jpg'),\n  normalScale: new THREE.Vector2(0.85, 0.85),\n  specular: new THREE.Color(0x2b3f57),\n  shininess: 18\n});\n\nconst earth = new THREE.Mesh(new THREE.SphereGeometry(RADIUS, 96, 64), earthMat);\ntilt.add(earth);\n\n// ---------------------------------------------------------------------- clouds\nconst cloudMat = new THREE.MeshPhongMaterial({\n  map: load('earth_clouds_1024.png', THREE.SRGBColorSpace, () => {\n    clouds.visible = false;\n  }),\n  transparent: true,\n  opacity: 0.45,\n  depthWrite: false,\n  blending: THREE.NormalBlending\n});\nconst clouds = new THREE.Mesh(new THREE.SphereGeometry(RADIUS * 1.012, 96, 64), cloudMat);\ntilt.add(clouds);\n\n// ----------------------------------------------------------------- atmosphere\n// Backside shell with a fresnel falloff — cheap, convincing limb glow.\nconst atmosphere = new THREE.Mesh(\n  new THREE.SphereGeometry(RADIUS * 1.16, 96, 64),\n  new THREE.ShaderMaterial({\n    transparent: true,\n    side: THREE.BackSide,\n    blending: THREE.AdditiveBlending,\n    depthWrite: false,\n    uniforms: { uSun: { value: sun.position.clone().normalize() } },\n    vertexShader: `\n      varying vec3 vNormal;\n      varying vec3 vWorldNormal;\n      void main() {\n        vNormal = normalize(normalMatrix * normal);\n        vWorldNormal = normalize(mat3(modelMatrix) * normal);\n        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n      }\n    `,\n    fragmentShader: `\n      uniform vec3 uSun;\n      varying vec3 vNormal;\n      varying vec3 vWorldNormal;\n      void main() {\n        float rim = pow(clamp(1.0 - abs(vNormal.z), 0.0, 1.0), 3.2);\n        float lit = smoothstep(-0.45, 0.55, dot(vWorldNormal, uSun));\n        vec3 col = mix(vec3(0.16, 0.36, 0.85), vec3(0.45, 0.68, 1.0), lit);\n        gl_FragColor = vec4(col, rim * (0.18 + lit * 0.85));\n      }\n    `\n  })\n);\nscene.add(atmosphere);\n\n// ------------------------------------------------------------------ starfield\nfunction makeStars(count, spread) {",
+                "stderr": "",
+                "exit_code": 0
+              },
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGEyj1P6HVuxM7n14xhJ",
+      "role": "assistant",
+      "created": 1787331201,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_0185VKwCjSwwS26hMTBrxGcv",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "shell",
+              "arguments": {
+                "command": "for u in \"https://unpkg.com/three@0.160.0/examples/textures/planets/earth_atmos_2048.jpg\" \"https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_atmos_2048.jpg\" \"https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_lights_2048.png\" \"https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_specular_2048.jpg\" \"https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_normal_2048.jpg\" \"https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_clouds_1024.png\"; do printf \"%s \" \"$(curl -s -o /dev/null -w '%{http_code} %{size_download}' -L \"$u\")\"; echo \"$u\"; done; sed -n 240,316p /Users/alexanderhancock/Development/earth.html"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "developer"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 16482,
+          "outputTokens": 813,
+          "totalTokens": 17295,
+          "cacheReadTokens": 12842,
+          "cacheWriteTokens": 3638,
+          "cost": 0.0494935,
+          "costSource": "estimated",
+          "elapsedMs": 12077,
+          "timeToFirstTokenMs": 10690
+        }
+      }
+    },
+    {
+      "id": "msg_8425ca76-5eba-4935-b354-ab3044b62b21",
+      "role": "user",
+      "created": 1787331201,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_0185VKwCjSwwS26hMTBrxGcv",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "404 72 https://unpkg.com/three@0.160.0/examples/textures/planets/earth_atmos_2048.jpg\n200 512606 https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_atmos_2048.jpg\n200 734910 https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_lights_2048.png\n200 223421 https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_specular_2048.jpg\n200 336774 https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_normal_2048.jpg\n200 260222 https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_clouds_1024.png\nfunction makeStars(count, spread) {\n  const pos = new Float32Array(count * 3);\n  const col = new Float32Array(count * 3);\n  const c = new THREE.Color();\n  for (let i = 0; i < count; i++) {\n    // uniform points on a shell\n    const u = Math.random() * 2 - 1;\n    const theta = Math.random() * Math.PI * 2;\n    const r = spread * (0.75 + Math.random() * 0.25);\n    const s = Math.sqrt(1 - u * u);\n    pos[i * 3]     = r * s * Math.cos(theta);\n    pos[i * 3 + 1] = r * u;\n    pos[i * 3 + 2] = r * s * Math.sin(theta);\n\n    const t = Math.random();\n    c.setHSL(t < 0.8 ? 0.58 : 0.08, 0.35, 0.55 + Math.random() * 0.45);\n    col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;\n  }\n  const g = new THREE.BufferGeometry();\n  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));\n  g.setAttribute('color', new THREE.BufferAttribute(col, 3));\n  return g;\n}\n\nconst stars = new THREE.Points(\n  makeStars(7000, 400),\n  new THREE.PointsMaterial({\n    size: 1.1,\n    sizeAttenuation: false,\n    vertexColors: true,\n    transparent: true,\n    opacity: 0.9,\n    depthWrite: false\n  })\n);\nscene.add(stars);\n\nconst brightStars = new THREE.Points(\n  makeStars(220, 400),\n  new THREE.PointsMaterial({\n    size: 2.6,\n    sizeAttenuation: false,\n    vertexColors: true,\n    transparent: true,\n    opacity: 0.85,\n    depthWrite: false\n  })\n);\nscene.add(brightStars);\n\n// ------------------------------------------------------------------ animation\nconst clock = new THREE.Clock();\n\nfunction tick() {\n  const dt = clock.getDelta();\n\n  earth.rotation.y  += dt * 0.055;\n  clouds.rotation.y += dt * 0.072;   // clouds drift a touch faster\n  stars.rotation.y  += dt * 0.002;\n\n  controls.update();\n  renderer.render(scene, camera);\n  requestAnimationFrame(tick);\n}\ntick();\n\naddEventListener('resize', () => {\n  camera.aspect = innerWidth / innerHeight;\n  camera.updateProjectionMatrix();\n  renderer.setSize(innerWidth, innerHeight);\n});\n\nconst hint = document.getElementById('hint');\nsetTimeout(() => { hint.style.opacity = '0'; }, 5000);\n</script>\n</body>\n</html>",
+                  "annotations": {
+                    "priority": 0.0
+                  }
+                }
+              ],
+              "structuredContent": {
+                "stdout": "404 72 https://unpkg.com/three@0.160.0/examples/textures/planets/earth_atmos_2048.jpg\n200 512606 https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_atmos_2048.jpg\n200 734910 https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_lights_2048.png\n200 223421 https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_specular_2048.jpg\n200 336774 https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_normal_2048.jpg\n200 260222 https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/earth_clouds_1024.png\nfunction makeStars(count, spread) {\n  const pos = new Float32Array(count * 3);\n  const col = new Float32Array(count * 3);\n  const c = new THREE.Color();\n  for (let i = 0; i < count; i++) {\n    // uniform points on a shell\n    const u = Math.random() * 2 - 1;\n    const theta = Math.random() * Math.PI * 2;\n    const r = spread * (0.75 + Math.random() * 0.25);\n    const s = Math.sqrt(1 - u * u);\n    pos[i * 3]     = r * s * Math.cos(theta);\n    pos[i * 3 + 1] = r * u;\n    pos[i * 3 + 2] = r * s * Math.sin(theta);\n\n    const t = Math.random();\n    c.setHSL(t < 0.8 ? 0.58 : 0.08, 0.35, 0.55 + Math.random() * 0.45);\n    col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;\n  }\n  const g = new THREE.BufferGeometry();\n  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));\n  g.setAttribute('color', new THREE.BufferAttribute(col, 3));\n  return g;\n}\n\nconst stars = new THREE.Points(\n  makeStars(7000, 400),\n  new THREE.PointsMaterial({\n    size: 1.1,\n    sizeAttenuation: false,\n    vertexColors: true,\n    transparent: true,\n    opacity: 0.9,\n    depthWrite: false\n  })\n);\nscene.add(stars);\n\nconst brightStars = new THREE.Points(\n  makeStars(220, 400),\n  new THREE.PointsMaterial({\n    size: 2.6,\n    sizeAttenuation: false,\n    vertexColors: true,\n    transparent: true,\n    opacity: 0.85,\n    depthWrite: false\n  })\n);\nscene.add(brightStars);\n\n// ------------------------------------------------------------------ animation\nconst clock = new THREE.Clock();\n\nfunction tick() {\n  const dt = clock.getDelta();\n\n  earth.rotation.y  += dt * 0.055;\n  clouds.rotation.y += dt * 0.072;   // clouds drift a touch faster\n  stars.rotation.y  += dt * 0.002;\n\n  controls.update();\n  renderer.render(scene, camera);\n  requestAnimationFrame(tick);\n}\ntick();\n\naddEventListener('resize', () => {\n  camera.aspect = innerWidth / innerHeight;\n  camera.updateProjectionMatrix();\n  renderer.setSize(innerWidth, innerHeight);\n});\n\nconst hint = document.getElementById('hint');\nsetTimeout(() => { hint.style.opacity = '0'; }, 5000);\n</script>\n</body>\n</html>",
+                "stderr": "",
+                "exit_code": 0
+              },
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGEzcdSKYz6uJSxMKpuZ",
+      "role": "assistant",
+      "created": 1787331208,
+      "content": [
+        {
+          "type": "text",
+          "text": "Found it — my file loaded textures from **unpkg**, which 404s for `examples/textures/` (unpkg's three package doesn't ship the examples textures). So it was silently falling back to the ugly procedural canvas globe. Your reference uses the **jsDelivr GitHub** path, which serves them fine. Rewriting with that source plus night-lights."
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 18228,
+          "outputTokens": 5860,
+          "totalTokens": 24088,
+          "cacheReadTokens": 16480,
+          "cacheWriteTokens": 1746,
+          "cost": 0.1656625,
+          "costSource": "estimated",
+          "elapsedMs": 53093,
+          "timeToFirstTokenMs": 6161
+        }
+      }
+    },
+    {
+      "id": "msg_e800f35c-fa53-413c-8174-1770d5c5273f",
+      "role": "assistant",
+      "created": 1787331255,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_014Toq95bP9CGndoeQ2WRnLm",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "write",
+              "arguments": {
+                "path": "/Users/alexanderhancock/Development/goose-earth/earth.html",
+                "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n<title>Spinning Earth</title>\n<style>\n  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }\n  canvas { display: block; }\n  #hint {\n    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);\n    font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;\n    color: rgba(255,255,255,.35); letter-spacing: .08em; text-transform: uppercase;\n    pointer-events: none; user-select: none; transition: opacity .8s ease;\n  }\n</style>\n</head>\n<body>\n<div id=\"hint\">drag to rotate &middot; scroll to zoom</div>\n\n<script type=\"importmap\">\n{\n  \"imports\": {\n    \"three\": \"https://unpkg.com/three@0.160.0/build/three.module.js\",\n    \"three/addons/\": \"https://unpkg.com/three@0.160.0/examples/jsm/\"\n  }\n}\n</script>\n\n<script type=\"module\">\nimport * as THREE from 'three';\nimport { OrbitControls } from 'three/addons/controls/OrbitControls.js';\n\n// NOTE: unpkg does not serve three's examples/textures/ — jsDelivr's gh mirror does.\nconst TEX = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/textures/planets/';\n\n// ---------------------------------------------------------------- scene setup\nconst renderer = new THREE.WebGLRenderer({ antialias: true });\nrenderer.setPixelRatio(Math.min(devicePixelRatio, 2));\nrenderer.setSize(innerWidth, innerHeight);\nrenderer.outputColorSpace = THREE.SRGBColorSpace;\nrenderer.toneMapping = THREE.ACESFilmicToneMapping;\nrenderer.toneMappingExposure = 1.0;\ndocument.body.appendChild(renderer.domElement);\n\nconst scene = new THREE.Scene();\nscene.background = new THREE.Color(0x000000);\n\nconst camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 2000);\ncamera.position.set(0, 0.9, 4.2);\n\nconst controls = new OrbitControls(camera, renderer.domElement);\ncontrols.enableDamping = true;\ncontrols.dampingFactor = 0.06;\ncontrols.rotateSpeed = 0.45;\ncontrols.zoomSpeed = 0.7;\ncontrols.minDistance = 1.5;\ncontrols.maxDistance = 12;\ncontrols.enablePan = false;\n\n// ------------------------------------------------------------------- lighting\nscene.add(new THREE.AmbientLight(0xffffff, 0.05));\n\nconst SUN_DIR = new THREE.Vector3(5, 2, 3).normalize();\nconst sun = new THREE.DirectionalLight(0xfff4e8, 2.8);\nsun.position.copy(SUN_DIR).multiplyScalar(10);\nscene.add(sun);\n\n// cool bounce so the night limb reads as a silhouette rather than a void\nconst fill = new THREE.DirectionalLight(0x2a4a7a, 0.30);\nfill.position.set(-4, -1, -3);\nscene.add(fill);\n\n// ------------------------------------------------------------------- textures\nconst loader = new THREE.TextureLoader();\nloader.setCrossOrigin('anonymous');\nconst maxAniso = renderer.capabilities.getMaxAnisotropy();\n\nfunction load(file, colorSpace, onFail) {\n  return loader.load(\n    TEX + file,\n    t => {\n      if (colorSpace) t.colorSpace = colorSpace;\n      t.anisotropy = maxAniso;          // keeps coastlines crisp at grazing angles\n      t.wrapS = THREE.RepeatWrapping;\n      t.needsUpdate = true;\n    },\n    undefined,\n    () => onFail && onFail()\n  );\n}\n\n// ---------------------------------------------------------------------- earth\nconst RADIUS = 1;\nconst tilt = new THREE.Group();\ntilt.rotation.z = THREE.MathUtils.degToRad(23.4);\nscene.add(tilt);\n\nconst dayMap      = load('earth_atmos_2048.jpg',    THREE.SRGBColorSpace, () => fallback());\nconst nightMap    = load('earth_lights_2048.png',   THREE.SRGBColorSpace);\nconst specularMap = load('earth_specular_2048.jpg');\nconst normalMap   = load('earth_normal_2048.jpg');\n\nconst earthMat = new THREE.MeshPhongMaterial({\n  map: dayMap,\n  specularMap,                       // only oceans catch the sun\n  normalMap,\n  normalScale: new THREE.Vector2(0.9, 0.9),\n  specular: new THREE.Color(0x35506e),\n  shininess: 22\n});\n\n// Inject city lights on the dark side, blended across the terminator.\nconst uSunView = { value: new THREE.Vector3() };\nearthMat.onBeforeCompile = shader => {\n  shader.uniforms.uNight = { value: nightMap };\n  shader.uniforms.uSunView = uSunView;\n  shader.fragmentShader = shader.fragmentShader\n    .replace('#include <common>', `\n      #include <common>\n      uniform sampler2D uNight;\n      uniform vec3 uSunView;\n    `)\n    .replace('#include <dithering_fragment>', `\n      #include <dithering_fragment>\n      float ndl = dot(normalize(vNormal), normalize(uSunView));\n      float night = smoothstep(0.12, -0.22, ndl);          // 0 = day, 1 = night\n      vec3 lights = texture2D(uNight, vMapUv).rgb;\n      lights *= smoothstep(0.06, 0.5, length(lights));      // kill sensor haze\n      gl_FragColor.rgb += lights * night * 1.5;\n    `);\n};\n\nconst earth = new THREE.Mesh(new THREE.SphereGeometry(RADIUS, 128, 96), earthMat);\ntilt.add(earth);\n\n// --------------------------------------------------------------------- clouds\nconst cloudMat = new THREE.MeshPhongMaterial({\n  map: load('earth_clouds_1024.png', THREE.SRGBColorSpace, () => { clouds.visible = false; }),\n  transparent: true,\n  opacity: 0.42,\n  depthWrite: false,\n  specular: new THREE.Color(0x111111),\n  shininess: 4\n});\nconst clouds = new THREE.Mesh(new THREE.SphereGeometry(RADIUS * 1.012, 96, 64), cloudMat);\ntilt.add(clouds);\n\n// ----------------------------------------------------------------- atmosphere\n// Backside shell with fresnel falloff — cheap, convincing limb glow.\nconst atmosphere = new THREE.Mesh(\n  new THREE.SphereGeometry(RADIUS * 1.16, 96, 64),\n  new THREE.ShaderMaterial({\n    transparent: true,\n    side: THREE.BackSide,\n    blending: THREE.AdditiveBlending,\n    depthWrite: false,\n    uniforms: { uSun: { value: SUN_DIR.clone() } },\n    vertexShader: `\n      varying vec3 vNormalView;\n      varying vec3 vNormalWorld;\n      void main() {\n        vNormalView  = normalize(normalMatrix * normal);\n        vNormalWorld = normalize(mat3(modelMatrix) * normal);\n        gl_Position  = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n      }\n    `,\n    fragmentShader: `\n      uniform vec3 uSun;\n      varying vec3 vNormalView;\n      varying vec3 vNormalWorld;\n      void main() {\n        float rim = pow(clamp(1.0 - abs(vNormalView.z), 0.0, 1.0), 3.2);\n        float lit = smoothstep(-0.45, 0.55, dot(vNormalWorld, uSun));\n        vec3 col = mix(vec3(0.16, 0.36, 0.85), vec3(0.48, 0.70, 1.0), lit);\n        gl_FragColor = vec4(col, rim * (0.16 + lit * 0.85));\n      }\n    `\n  })\n);\nscene.add(atmosphere);\n\n// ------------------------------------------------------------------ starfield\nfunction makeStars(count, spread) {\n  const pos = new Float32Array(count * 3);\n  const col = new Float32Array(count * 3);\n  const c = new THREE.Color();\n  for (let i = 0; i < count; i++) {\n    const u = Math.random() * 2 - 1;                 // uniform on a shell\n    const theta = Math.random() * Math.PI * 2;\n    const r = spread * (0.75 + Math.random() * 0.25);\n    const s = Math.sqrt(1 - u * u);\n    pos[i * 3]     = r * s * Math.cos(theta);\n    pos[i * 3 + 1] = r * u;\n    pos[i * 3 + 2] = r * s * Math.sin(theta);\n    c.setHSL(Math.random() < 0.8 ? 0.58 : 0.08, 0.35, 0.55 + Math.random() * 0.45);\n    col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;\n  }\n  const g = new THREE.BufferGeometry();\n  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));\n  g.setAttribute('color', new THREE.BufferAttribute(col, 3));\n  return g;\n}\n\nconst starMat = s => new THREE.PointsMaterial({\n  size: s, sizeAttenuation: false, vertexColors: true,\n  transparent: true, opacity: 0.9, depthWrite: false\n});\nconst stars = new THREE.Points(makeStars(7000, 400), starMat(1.1));\nscene.add(stars);\nscene.add(new THREE.Points(makeStars(220, 400), starMat(2.6)));\n\n// ------------------------------------------- offline fallback (CDN unreachable)\nfunction fallback() {\n  const w = 1024, h = 512;\n  const c = document.createElement('canvas');\n  c.width = w; c.height = h;\n  const ctx = c.getContext('2d');\n  const ocean = ctx.createLinearGradient(0, 0, 0, h);\n  ocean.addColorStop(0, '#0b2a4a'); ocean.addColorStop(0.5, '#10406e'); ocean.addColorStop(1, '#0b2a4a');\n  ctx.fillStyle = ocean; ctx.fillRect(0, 0, w, h);\n\n  const perm = new Uint8Array(512);\n  for (let i = 0; i < 256; i++) perm[i] = i;\n  for (let i = 255; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [perm[i], perm[j]] = [perm[j], perm[i]]; }\n  for (let i = 0; i < 256; i++) perm[i + 256] = perm[i];\n  const fade = t => t * t * t * (t * (t * 6 - 15) + 10);\n  const grad = (hash, x, y) => ((hash & 1) ? x : -x) + ((hash & 2) ? y : -y);\n  const noise = (x, y) => {\n    const X = Math.floor(x) & 255, Y = Math.floor(y) & 255;\n    x -= Math.floor(x); y -= Math.floor(y);\n    const u = fade(x), v = fade(y), a = perm[X] + Y, b = perm[X + 1] + Y;\n    return THREE.MathUtils.lerp(\n      THREE.MathUtils.lerp(grad(perm[a], x, y), grad(perm[b], x - 1, y), u),\n      THREE.MathUtils.lerp(grad(perm[a + 1], x, y - 1), grad(perm[b + 1], x - 1, y - 1), u), v);\n  };\n  const fbm = (x, y) => {\n    let sum = 0, amp = 0.5, freq = 1;\n    for (let o = 0; o < 5; o++) { sum += noise(x * freq, y * freq) * amp; amp *= 0.5; freq *= 2; }\n    return sum;\n  };\n\n  const img = ctx.getImageData(0, 0, w, h), px = img.data;\n  for (let y = 0; y < h; y++) {\n    const lat = (y / h - 0.5) * Math.PI;\n    for (let x = 0; x < w; x++) {\n      const lon = (x / w) * Math.PI * 2;\n      const nx = Math.cos(lon) * Math.cos(lat) * 2.2, ny = Math.sin(lon) * Math.cos(lat) * 2.2;\n      const n = fbm(nx + 11.3, ny + 4.7) + fbm(nx * 2.7 - 3.1, ny * 2.7 + 9.4) * 0.35;\n      const i = (y * w + x) * 4;\n      if (n > 0.06) {\n        const elev = Math.min(1, (n - 0.06) * 2.4);\n        const cold = Math.min(1, Math.max(0, (Math.abs(lat) - 0.95) * 2.6));\n        const dry = Math.max(0, 1 - Math.abs(Math.abs(lat) - 0.42) * 5);\n        px[i]     = THREE.MathUtils.lerp(46 + elev * 120 + dry * 80, 236, cold);\n        px[i + 1] = THREE.MathUtils.lerp(84 + elev * 78 - dry * 10, 240, cold);\n        px[i + 2] = THREE.MathUtils.lerp(38 + elev * 62 - dry * 10, 246, cold);\n      } else if (n > 0.02) {\n        px[i] = 30 + n * 120; px[i + 1] = 96 + n * 120; px[i + 2] = 140;\n      }\n    }\n  }\n  ctx.putImageData(img, 0, 0);\n  const tex = new THREE.CanvasTexture(c);\n  tex.colorSpace = THREE.SRGBColorSpace;\n  tex.wrapS = THREE.RepeatWrapping;\n  earthMat.map = tex;\n  earthMat.specularMap = null;\n  earthMat.normalMap = null;\n  earthMat.needsUpdate = true;\n}\n\n// ------------------------------------------------------------------ animation\nconst clock = new THREE.Clock();\nconst nrm = new THREE.Matrix3();\n\nrenderer.setAnimationLoop(() => {\n  const dt = clock.getDelta();\n  earth.rotation.y  += dt * 0.055;\n  clouds.rotation.y += dt * 0.072;    // clouds drift a touch faster\n  stars.rotation.y  += dt * 0.002;\n\n  // sun direction in view space, for the night-lights terminator\n  uSunView.value.copy(SUN_DIR).applyMatrix3(nrm.setFromMatrix4(camera.matrixWorldInverse)).normalize();\n\n  controls.update();\n  renderer.render(scene, camera);\n});\n\naddEventListener('resize', () => {\n  camera.aspect = innerWidth / innerHeight;\n  camera.updateProjectionMatrix();\n  renderer.setSize(innerWidth, innerHeight);\n});\n\nsetTimeout(() => { document.getElementById('hint').style.opacity = '0'; }, 5000);\n</script>\n</body>\n</html>\n"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "developer"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        }
+      }
+    },
+    {
+      "id": "msg_2e09b453-8b5b-44cb-be59-560d651a0d09",
+      "role": "user",
+      "created": 1787331255,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_014Toq95bP9CGndoeQ2WRnLm",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Wrote /Users/alexanderhancock/Development/goose-earth/earth.html (299 lines)",
+                  "annotations": {
+                    "priority": 0.0
+                  }
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGF4Yq6dTEJbVuM7mpsH",
+      "role": "assistant",
+      "created": 1787331259,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_01EDX1RgzX7XypRduqiL7JPo",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "shell",
+              "arguments": {
+                "command": "cd /Users/alexanderhancock/Development/goose-earth && node -e \"\nconst fs=require('fs');\nconst code=fs.readFileSync('earth.html','utf8').match(/<script type=\\\"module\\\">([\\s\\S]*?)<\\/script>/)[1];\nfs.writeFileSync('/tmp/_c.mjs',code.replace(/from 'three(\\/addons.*)?'/g,\\\"from 'node:util'\\\"));\n\" && node --check /tmp/_c.mjs && echo OK && rm /tmp/_c.mjs && open earth.html"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "developer"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 23889,
+          "outputTokens": 235,
+          "totalTokens": 24124,
+          "cacheReadTokens": 18226,
+          "cacheWriteTokens": 5661,
+          "cost": 0.05037925,
+          "costSource": "estimated",
+          "elapsedMs": 4258,
+          "timeToFirstTokenMs": 4055
+        }
+      }
+    },
+    {
+      "id": "msg_9cb9b024-8e7d-4deb-a33d-d4959807d9d1",
+      "role": "user",
+      "created": 1787331259,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_01EDX1RgzX7XypRduqiL7JPo",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "OK",
+                  "annotations": {
+                    "priority": 0.0
+                  }
+                }
+              ],
+              "structuredContent": {
+                "stdout": "OK",
+                "stderr": "",
+                "exit_code": 0
+              },
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGF4qxjGhTy4wndVxiMu",
+      "role": "assistant",
+      "created": 1787331265,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_01Am1hAsqkBdyJWmVUPcmUAh",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "shell",
+              "arguments": {
+                "command": "cd /Users/alexanderhancock/Development/goose-earth && sleep 6 && screencapture -x -R 200,150,1100,850 /tmp/earth_shot.png && echo done"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "developer"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 24131,
+          "outputTokens": 297,
+          "totalTokens": 24428,
+          "cacheReadTokens": 23887,
+          "cacheWriteTokens": 242,
+          "cost": 0.020891,
+          "costSource": "estimated",
+          "elapsedMs": 11828,
+          "timeToFirstTokenMs": 5702
+        }
+      }
+    },
+    {
+      "id": "msg_eda79b67-0f6a-46a8-bd89-57bca76d3427",
+      "role": "user",
+      "created": 1787331265,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_01Am1hAsqkBdyJWmVUPcmUAh",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "could not create image from rect\n\nCommand exited with code 1",
+                  "annotations": {
+                    "priority": 0.0
+                  }
+                }
+              ],
+              "structuredContent": {
+                "stdout": "",
+                "stderr": "could not create image from rect",
+                "exit_code": 1
+              },
+              "isError": true
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGF5jqANmh5GNpZNvfbN",
+      "role": "assistant",
+      "created": 1787331274,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_01JJ9GyYfo318r4QZottijSH",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "shell",
+              "arguments": {
+                "command": "cd /tmp && screencapture -x earth_full.png 2>&1; ls -la earth_full.png"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "developer"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 24261,
+          "outputTokens": 80,
+          "totalTokens": 24341,
+          "cacheReadTokens": 24129,
+          "cacheWriteTokens": 130,
+          "cost": 0.014887,
+          "costSource": "estimated",
+          "elapsedMs": 2624,
+          "timeToFirstTokenMs": 2533
+        }
+      }
+    },
+    {
+      "id": "msg_fb1b49ee-032a-41ad-a7b0-0d5f027257bb",
+      "role": "user",
+      "created": 1787331274,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_01JJ9GyYfo318r4QZottijSH",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "could not create image from display\nls: earth_full.png: No such file or directory\n\nCommand exited with code 1",
+                  "annotations": {
+                    "priority": 0.0
+                  }
+                }
+              ],
+              "structuredContent": {
+                "stdout": "could not create image from display",
+                "stderr": "ls: earth_full.png: No such file or directory",
+                "exit_code": 1
+              },
+              "isError": true
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGF5uogqJBxa9xxt6JC5",
+      "role": "assistant",
+      "created": 1787331277,
+      "content": [
+        {
+          "type": "text",
+          "text": "Screen-capture permission isn't granted to this shell, so I can't grab a screenshot — but I verified all four texture URLs return HTTP 200 from jsDelivr, and the module parses cleanly."
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 24378,
+          "outputTokens": 481,
+          "totalTokens": 24859,
+          "cacheReadTokens": 24259,
+          "cacheWriteTokens": 117,
+          "cost": 0.02489575,
+          "costSource": "estimated",
+          "elapsedMs": 8294,
+          "timeToFirstTokenMs": 2987
+        }
+      }
+    },
+    {
+      "id": "msg_5801648e-ee11-44ca-a6cf-21683418bba4",
+      "role": "assistant",
+      "created": 1787331282,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_0128dCHxmBQx6gdAjLT4c2D2",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_write",
+              "arguments": {
+                "content": "Task: spinning Earth html — realistic textures applied\n\n- [x] Root cause found: unpkg 404s on examples/textures/ → silent procedural fallback\n- [x] Switched to jsDelivr gh mirror (mrdoob/three.js@r160), all 4 textures verified HTTP 200\n- [x] day/color + specular (ocean-only glint) + normal + clouds maps\n- [x] Added earth_lights_2048 night city lights via onBeforeCompile terminator blend\n- [x] OrbitControls with damping, ACES tone mapping, max anisotropy, 128x96 sphere\n- [x] Fresnel atmosphere, two-tier starfield, 23.4° tilt, resize handling\n- [x] Procedural fallback retained for offline\n- [x] Syntax checked, opened in browser (screenshot blocked by macOS perms)\n"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "todo"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        }
+      }
+    },
+    {
+      "id": "msg_045f67b8-ae10-4949-8e2b-6ec7eea066ea",
+      "role": "user",
+      "created": 1787331282,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_0128dCHxmBQx6gdAjLT4c2D2",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated (670 chars)"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGF6XMMLbtP1iTKy187F",
+      "role": "assistant",
+      "created": 1787331284,
+      "content": [
+        {
+          "type": "text",
+          "text": "Updated `/Users/alexanderhancock/Development/goose-earth/earth.html`.\n\n**The actual bug:** my version pointed at `unpkg.com/three@0.160.0/examples/textures/...`, which returns **404** — the npm `three` package doesn't ship the example textures. Every texture load failed, so it silently fell back to the blobby procedural canvas globe. Your reference file used `cdn.jsdelivr.net/gh/mrdoob/three.js@r160/...`, the GitHub mirror, which does serve them. I confirmed with curl:\n\n```\n404      unpkg .../earth_atmos_2048.jpg\n200 512K jsdelivr .../earth_atmos_2048.jpg\n200 223K earth_specular_2048.jpg\n200 336K earth_normal_2048.jpg\n200 260K earth_clouds_1024.png\n200 734K earth_lights_2048.png\n```\n\n**What's now rendering:**\n- **Real NASA-derived maps** — color/day, specular (so only oceans glint), normal (terrain relief), and clouds.\n- **Night-side city lights** — I added `earth_lights_2048.png`, injected into the Phong shader via `onBeforeCompile`. It computes the sun dot product in view space and `smoothstep`s the lights in across the terminator, so cities fade on exactly where the sunset line falls. This goes beyond the reference file.\n- **Max anisotropic filtering** and a 128×96 sphere — coastlines stay sharp at grazing angles instead of smearing.\n- **OrbitControls** with damping (replacing my hand-rolled drag), ACES tone mapping, fresnel limb glow, two-tier starfield, 23.4° tilt.\n- Procedural fallback kept for the offline case, but it's now genuinely a fallback rather than the default.\n\nOne caveat: I couldn't screenshot to visually confirm — macOS denied screen-recording permission to the shell. The URLs and syntax check out, but give it a look and tell me if the night lights are too hot or the clouds too heavy; both are one-line tweaks (`* 1.5` on the lights, `opacity: 0.42` on clouds)."
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 24800,
+          "outputTokens": 728,
+          "totalTokens": 25528,
+          "cacheReadTokens": 24376,
+          "cacheWriteTokens": 422,
+          "cost": 0.0330355,
+          "costSource": "estimated",
+          "elapsedMs": 11743,
+          "timeToFirstTokenMs": 1608
+        }
+      }
+    },
+    {
+      "id": "msg_d1854773-8198-4a06-9135-cbb3eac6036c",
+      "role": "user",
+      "created": 1787331298,
+      "content": [
+        {
+          "type": "text",
+          "text": "Open it"
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_269564f7-b966-4226-b411-35822330b4d1",
+      "role": "user",
+      "created": 1787331298,
+      "content": [
+        {
+          "type": "text",
+          "text": "<turn-context>\n<current-time>2026-08-21 12:54:00 -04:00</current-time>\n<working-directory>/Users/alexanderhancock/Development/goose-earth</working-directory>\n\nCurrent tasks and notes:\nTask: spinning Earth html — realistic textures applied\n\n- [x] Root cause found: unpkg 404s on examples/textures/ → silent procedural fallback\n- [x] Switched to jsDelivr gh mirror (mrdoob/three.js@r160), all 4 textures verified HTTP 200\n- [x] day/color + specular (ocean-only glint) + normal + clouds maps\n- [x] Added earth_lights_2048 night city lights via onBeforeCompile terminator blend\n- [x] OrbitControls with damping, ACES tone mapping, max anisotropy, 128x96 sphere\n- [x] Fresnel atmosphere, two-tier starfield, 23.4° tilt, resize handling\n- [x] Procedural fallback retained for offline\n- [x] Syntax checked, opened in browser (screenshot blocked by macOS perms)\n\n\n</turn-context>"
+        }
+      ],
+      "metadata": {
+        "userVisible": false,
+        "agentVisible": true,
+        "turnContext": true
+      }
+    },
+    {
+      "id": "msg_011CeGF7gJPoTgrhqaZ9K6JB",
+      "role": "assistant",
+      "created": 1787331302,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "toolu_011ATfLbqzqNt8GtJcUWCEaf",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "shell",
+              "arguments": {
+                "command": "cd /Users/alexanderhancock/Development/goose-earth && open earth.html && echo \"opened\""
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "developer"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 25907,
+          "outputTokens": 80,
+          "totalTokens": 25987,
+          "cacheReadTokens": 24798,
+          "cacheWriteTokens": 1107,
+          "cost": 0.02132775,
+          "costSource": "estimated",
+          "elapsedMs": 4484,
+          "timeToFirstTokenMs": 4374
+        }
+      }
+    },
+    {
+      "id": "msg_550e79e5-bfa4-4f4b-aa23-d290e1e6093c",
+      "role": "user",
+      "created": 1787331302,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "toolu_011ATfLbqzqNt8GtJcUWCEaf",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "resultType": "complete",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "opened",
+                  "annotations": {
+                    "priority": 0.0
+                  }
+                }
+              ],
+              "structuredContent": {
+                "stdout": "opened",
+                "stderr": "",
+                "exit_code": 0
+              },
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_011CeGF81XHgzSZNscaTGiwi",
+      "role": "assistant",
+      "created": 1787331305,
+      "content": [
+        {
+          "type": "text",
+          "text": "Opened `earth.html` in your default browser.\n\nYou should see the Earth with real satellite imagery — continents, ocean glint on the sunlit side, drifting clouds, a blue limb glow, and city lights emerging on the night side as it rotates. Drag to orbit, scroll to zoom.\n\nLet me know if anything looks off and I'll adjust."
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true,
+        "inference": {
+          "provider": "anthropic",
+          "requestedModel": "claude-opus-5"
+        },
+        "usage": {
+          "inputTokens": 25994,
+          "outputTokens": 117,
+          "totalTokens": 26111,
+          "cacheReadTokens": 25905,
+          "cacheWriteTokens": 87,
+          "cost": 0.01643125,
+          "costSource": "estimated",
+          "elapsedMs": 4466,
+          "timeToFirstTokenMs": 2657
+        }
+      }
+    }
+  ],
+  "message_count": 37,
+  "last_message_at": "2026-08-21T16:55:05Z",
+  "provider_name": "anthropic",
+  "model_config": {
+    "model_name": "claude-opus-5",
+    "context_limit": 1000000,
+    "temperature": null,
+    "max_tokens": 128000,
+    "toolshim": false,
+    "toolshim_model": null,
+    "request_params": {
+      "thinking_effort": "high"
+    },
+    "reasoning": true
+  },
+  "goose_mode": "auto",
+  "archived_at": null,
+  "project_id": null,
+  "parent_session_id": null,
+  "last_message_snippet": null
+}
