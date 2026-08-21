@@ -114,12 +114,6 @@ export const oneLine = (s: string, max = 140): string => {
   return flat.length > max ? flat.slice(0, max - 1) + '…' : flat
 }
 
-export const looksLikeJson = (v: unknown): boolean => typeof v === 'object' && v !== null
-
-export function jsonField(label: string, value: unknown): Field {
-  return { label, value: JSON.stringify(value, null, 2), format: 'json' }
-}
-
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest
   it('fills step ends from the next step and preserves explicit ends', () => {
@@ -255,13 +249,6 @@ export function toDraft(block: BlockDraft, span: { start: number; end: number },
   }
 }
 
-export function expandGroup(blocks: BlockDraft[], start: number, end: number, usage?: GroupUsage): DraftStep[] {
-  if (!blocks.length) return []
-  const spans = spanBlocks(blocks, start, end)
-  const allocs = usage ? allocateTokens(blocks, usage) : []
-  return blocks.map((b, i) => toDraft(b, spans[i]!, allocs[i]))
-}
-
 function spanEnds(blocks: BlockDraft[], start: number, end: number): number[] {
   const ends: number[] = new Array(blocks.length)
   let prev = start
@@ -304,21 +291,20 @@ if (import.meta.vitest) {
     thinking,
   })
   it('splits output tokens across the blocks of one response, exactly', () => {
-    const steps = expandGroup([block('t', 10, true), block('a', 30), block('b', 70)], 0, 100, {
+    const allocations = allocateTokens([block('t', 10, true), block('a', 30), block('b', 70)], {
       tokens: tokensOf({ input: 5, output: 1000, cacheRead: 200 }),
       thinkingTokens: 300,
       costUsd: 0,
     })
-    expect(steps.map((s) => s.tokens?.output)).toEqual([300, 210, 490])
-    expect(steps.map((s) => s.tokens?.total)).toEqual([300, 210, 490])
-    expect(steps[0]!.request?.cacheRead).toBe(200)
-    expect(steps[1]!.request).toBeUndefined()
+    expect(allocations.map((a) => a.tokens.output)).toEqual([300, 210, 490])
+    expect(allocations.map((a) => a.tokens.total)).toEqual([300, 210, 490])
+    expect(allocations[0]!.request?.cacheRead).toBe(200)
+    expect(allocations[1]!.request).toBeUndefined()
   })
   it('spreads a span over blocks that have no timestamps of their own', () => {
-    const steps = expandGroup([block('a', 1), block('b', 3)], 0, 100)
-    expect(steps.map((s) => [s.start, s.end])).toEqual([
-      [0, 25],
-      [25, 100],
+    expect(spanBlocks([block('a', 1), block('b', 3)], 0, 100)).toEqual([
+      { start: 0, end: 25 },
+      { start: 25, end: 100 },
     ])
   })
 }

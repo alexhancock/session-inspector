@@ -1,276 +1,156 @@
-import {
-  Allocation,
-  BlockDraft,
-  DraftStep,
-  Fact,
-  RequestMark,
-  Session,
-  allocateTokens,
-  attributeInput,
-  contextOf,
-  finalizeSteps,
-  idleDraft,
-  oneLine,
-  spanBlocks,
-  sumRequests,
-  sumTokens,
-  toDraft,
-  tokensOf,
-} from './model'
-import { argFields, argPreview, textOf, valueFields } from './render'
+import { Fact } from './model'
+import { Harness, ResponseBlock, SessionEvent, SessionFile, Summary, Usage } from './harness'
+import { oneLine } from './model'
+import { textOf } from './render'
 
 type Rec = Record<string, any>
 
-const IDLE_MS = 1500
+const KINDS = ['user', 'assistant', 'attachment', 'system']
 
-const ts = (r: Rec): number => Date.parse(r.timestamp)
+const at = (r: Rec): number => Date.parse(r.timestamp)
 
-const isEvent = (r: Rec) =>
-  typeof r?.timestamp === 'string' && ['user', 'assistant', 'attachment', 'system'].includes(r.type)
+const ordered = (file: SessionFile): Rec[] =>
+  (file.data as Rec[])
+    .filter((r) => r && typeof r === 'object' && typeof r.timestamp === 'string' && KINDS.includes(r.type))
+    .sort((a, b) => at(a) - at(b))
 
-export function detect(input: unknown): boolean {
-  return (
-    Array.isArray(input) &&
-    input.some((r: Rec) => r && typeof r === 'object' && r.sessionId && (r.type === 'assistant' || r.type === 'user'))
-  )
-}
+const records = (file: SessionFile): Rec[] => (file.data as Rec[]).filter((r) => r && typeof r === 'object')
 
-export function parse(input: unknown, fileName: string): Session {
-  const records = (input as Rec[]).filter((r) => r && typeof r === 'object')
-  const events = records.filter(isEvent).sort((a, b) => ts(a) - ts(b))
-  const startedAt = events.length ? ts(events[0]!) : Date.now()
-  const endedAt = events.length ? ts(events[events.length - 1]!) : startedAt
+export const claudeCode: Harness = {
+  agent: 'Claude Code',
 
-  const blocksByEvent = new Map<number, BlockDraft[]>()
-  const byRequest = new Map<string, BlockDraft[]>()
-  events.forEach((r, idx) => {
-    if (r.type !== 'assistant') return
-    const content: Rec[] = Array.isArray(r.message?.content) ? r.message.content : []
-    const list = content.map((b, bi) =>
-      blockDraft(b, `${r.uuid ?? idx}-${bi}`, r.message?.model, Boolean(r.isSidechain), ts(r)),
+  recognizes(file) {
+    return (
+      Array.isArray(file.data) &&
+      file.data.some((r: Rec) => r && typeof r === 'object' && r.sessionId && ['user', 'assistant'].includes(r.type))
     )
-    blocksByEvent.set(idx, list)
-    const key = String(r.message?.id ?? r.uuid ?? idx)
-    byRequest.set(key, [...(byRequest.get(key) ?? []), ...list])
-  })
+  },
 
-  const allocations = new Map<string, Allocation>()
-  byRequest.forEach((list, key) => {
-    const u = events.find((r) => String(r.message?.id ?? '') === key)?.message?.usage ?? {}
-    allocateTokens(list, {
-      tokens: tokensOf({
-        input: u.input_tokens ?? 0,
-        output: u.output_tokens ?? 0,
-        cacheRead: u.cache_read_input_tokens ?? 0,
-        cacheWrite: u.cache_creation_input_tokens ?? 0,
-      }),
-      thinkingTokens: u.output_tokens_details?.thinking_tokens ?? 0,
-      costUsd: 0,
-    }).forEach((a, i) => allocations.set(list[i]!.id, a))
-  })
+  summarize(file): Summary {
+    const events = ordered(file)
+    const first = events[0] ?? {}
+    const last = events[events.length - 1] ?? first
+    const meta = (type: string) => records(file).find((r) => r.type === type) ?? {}
+    const prompt = events.find((r) => r.type === 'user' && typeof r.message?.content === 'string')
+    const model = [...events].reverse().find((r) => r.message?.model)?.message.model ?? 'unknown'
 
-  const drafts: DraftStep[] = []
-  const marks: RequestMark[] = []
-  const marked = new Set<string>()
-  const pendingTools = new Map<string, DraftStep>()
-  let cursor = startedAt
-  let model = ''
-  let i = 0
-
-  while (i < events.length) {
-    const r = events[i]!
-    const at = ts(r)
-
-    if (r.type === 'assistant') {
-      const msgId = r.message?.id
-      let j = i
-      const blocks: BlockDraft[] = []
-      let groupEnd = at
-      while (j < events.length && events[j]!.type === 'assistant' && events[j]!.message?.id === msgId) {
-        blocks.push(...(blocksByEvent.get(j) ?? []))
-        groupEnd = ts(events[j]!)
-        j++
-      }
-      model = r.message?.model || model
-      const groupStart = Math.min(cursor, at)
-      const key = String(msgId ?? r.uuid ?? i)
-      if (!marked.has(key)) {
-        marked.add(key)
-        const first = allocations.get(blocks[0]?.id ?? '')
-        if (first?.request) {
-          marks.push({ at: groupStart, context: contextOf(first.request), output: first.request.output })
-        }
-      }
-      spanBlocks(blocks, groupStart, groupEnd).forEach((span, k) => {
-        const block = blocks[k]!
-        const step = toDraft(block, span, allocations.get(block.id))
-        drafts.push(step)
-        const raw = block.raw as Rec
-        if (raw?.type === 'tool_use' && raw.id) pendingTools.set(raw.id, step)
-      })
-      cursor = groupEnd
-      i = j
-      continue
+    return {
+      id: first.sessionId ?? file.name,
+      title: meta('ai-title').aiTitle || oneLine(textOf(prompt?.message?.content) || file.name, 64),
+      model,
+      cwd: first.cwd ?? '',
+      startedAt: events.length ? at(first) : Date.now(),
+      endedAt: events.length ? at(last) : Date.now(),
+      facts: facts([
+        ['Agent', 'Claude Code'],
+        ['Model', model],
+        ['Working directory', first.cwd],
+        ['Git branch', first.gitBranch],
+        ['Version', first.version],
+        ['Permission mode', meta('permission-mode').permissionMode],
+        ['Session ID', first.sessionId],
+      ]),
     }
+  },
 
-    if (r.type === 'user') {
-      const content = r.message?.content
-      const contentBlocks: Rec[] = Array.isArray(content) ? content : []
-      const results = contentBlocks.filter((b) => b.type === 'tool_result')
-      if (results.length) {
-        results.forEach((b) => {
-          const step = pendingTools.get(b.tool_use_id)
-          const body = textOf(b.content)
-          if (!step) return
-          const wrote = step.end ?? step.start
-          step.end = Math.max(wrote, at)
-          step.isError = Boolean(b.is_error)
-          step.injectedChars = body.length
-          step.fields.push({
-            label: b.is_error ? 'Error' : 'Result',
-            value: body || '(empty)',
-            format: body.includes('\n') ? 'code' : 'text',
-          })
-          step.fields.push({
-            label: 'Timing',
-            value: `${secs(wrote - step.start)} writing the call, ${secs(at - wrote)} running it`,
-            format: 'text',
-          })
-          pendingTools.delete(b.tool_use_id)
+  timeline(file): SessionEvent[] {
+    const events = ordered(file)
+    const out: SessionEvent[] = []
+    let i = 0
+
+    while (i < events.length) {
+      const record = events[i] as Rec
+      const when = at(record)
+
+      if (record.type === 'assistant') {
+        const requestId = record.message?.id
+        const blocks: ResponseBlock[] = []
+        let end = when
+        while (i < events.length && events[i]!.type === 'assistant' && events[i]!.message?.id === requestId) {
+          const part = events[i] as Rec
+          end = at(part)
+          for (const block of part.message?.content ?? []) blocks.push(toBlock(block, end))
+          i++
+        }
+        out.push({
+          type: 'response',
+          at: end,
+          blocks,
+          requestId: String(requestId ?? when),
+          model: record.message?.model,
+          usage: toUsage(record.message?.usage),
+          sidechain: Boolean(record.isSidechain),
+          raw: record,
         })
-        cursor = at
+        continue
+      }
+
+      if (record.type === 'user') {
+        const content = record.message?.content
+        const results = (Array.isArray(content) ? content : []).filter((b: Rec) => b.type === 'tool_result')
+        if (results.length) {
+          for (const result of results) {
+            out.push({
+              type: 'result',
+              at: when,
+              callId: result.tool_use_id,
+              text: textOf(result.content),
+              failed: Boolean(result.is_error),
+              raw: result,
+            })
+          }
+        } else {
+          const text = textOf(content)
+          const typed = record.origin?.kind === 'human' || record.promptSource === 'typed'
+          out.push(
+            typed
+              ? { type: 'prompt', at: when, text, raw: record }
+              : { type: 'note', at: when, label: 'User context', detail: text, context: text, raw: record },
+          )
+        }
         i++
         continue
       }
-      const body = textOf(content)
-      const human = r.origin?.kind === 'human' || r.promptSource === 'typed'
-      if (human && at - cursor > IDLE_MS) drafts.push(idleDraft(`${r.uuid}-idle`, cursor, at))
-      drafts.push({
-        id: String(r.uuid ?? i),
-        kind: human ? 'prompt' : 'meta',
-        label: human ? 'Prompt' : 'User context',
-        preview: oneLine(body),
-        start: human ? at : Math.min(cursor, at),
-        end: at,
-        injectedChars: body.length,
-        fields: [{ label: human ? 'Prompt' : 'Content', value: body, format: 'text' }],
-        raw: r,
+
+      const attachment = record.attachment
+      out.push({
+        type: 'note',
+        at: when,
+        label: humanize(attachment ? (attachment.type ?? 'attachment') : (record.subtype ?? 'system')),
+        detail: attachment ?? record,
+        context: attachment ? JSON.stringify(attachment) : undefined,
+        preview: attachment ? attachmentPreview(attachment) : systemPreview(record),
+        raw: record,
       })
-      cursor = at
       i++
-      continue
     }
 
-    const a = r.attachment
-    drafts.push({
-      id: String(r.uuid ?? i),
-      kind: 'meta',
-      label: humanize(String(a ? (a.type ?? 'attachment') : (r.subtype ?? 'system'))),
-      preview: a
-        ? attachmentPreview(a)
-        : r.subtype === 'turn_duration'
-          ? `Turn completed in ${(r.durationMs / 1000).toFixed(1)}s across ${r.messageCount} messages`
-          : oneLine(JSON.stringify(r)),
-      start: Math.min(cursor, at),
-      end: at,
-      injectedChars: a ? JSON.stringify(a).length : 0,
-      fields: valueFields(a ? 'Attachment' : 'Event', a ?? r),
-      raw: r,
-    })
-    cursor = at
-    i++
-  }
-
-  const steps = attributeInput(finalizeSteps(drafts, endedAt), marks)
-  const first = events[0] ?? {}
-  const meta = (type: string) => records.find((r) => r.type === type) ?? {}
-  const firstPrompt = steps.find((s) => s.kind === 'prompt')
-
-  const facts: Fact[] = fact([
-    ['Agent', 'Claude Code'],
-    ['Model', model],
-    ['Working directory', first.cwd],
-    ['Git branch', first.gitBranch],
-    ['Version', first.version],
-    ['Permission mode', meta('permission-mode').permissionMode],
-    ['Session ID', first.sessionId],
-  ])
-
-  return {
-    id: first.sessionId ?? fileName,
-    title: meta('ai-title').aiTitle || (firstPrompt ? oneLine(firstPrompt.preview, 64) : fileName),
-    agent: 'Claude Code',
-    model: model || 'unknown',
-    cwd: first.cwd ?? '',
-    startedAt,
-    endedAt,
-    durationMs: endedAt - startedAt,
-    steps,
-    tokens: sumRequests(steps),
-    contributed: sumTokens(steps),
-    costUsd: 0,
-    facts,
-    fileName,
-  }
+    return out
+  },
 }
 
-function blockDraft(b: Rec, id: string, model: string | undefined, sidechain: boolean, end: number): BlockDraft {
-  const prefix = sidechain ? 'Subagent · ' : ''
-  const common = { id, model, end, raw: b }
-  if (b.type === 'thinking' || b.type === 'redacted_thinking') {
-    const body = String(b.thinking ?? '')
-    return {
-      ...common,
-      kind: 'thinking',
-      label: `${prefix}Thinking`,
-      preview: body ? oneLine(body) : 'Reasoning was not stored in this transcript',
-      weight: body.length || 1,
-      thinking: true,
-      fields: [
-        {
-          label: 'Reasoning',
-          value: body || 'This transcript keeps an encrypted signature in place of the reasoning text.',
-          format: 'text',
-        },
-      ],
-    }
+function toBlock(block: Rec, when: number): ResponseBlock {
+  if (block.type === 'thinking' || block.type === 'redacted_thinking') {
+    return { type: 'thinking', text: String(block.thinking ?? ''), at: when, raw: block }
   }
-  if (b.type === 'text') {
-    const body = String(b.text ?? '')
-    return {
-      ...common,
-      kind: 'response',
-      label: `${prefix}Assistant`,
-      preview: oneLine(body),
-      weight: body.length,
-      fields: [{ label: 'Message', value: body, format: 'text' }],
-    }
+  if (block.type === 'tool_use') {
+    return { type: 'call', id: block.id, name: block.name, args: block.input, at: when, raw: block }
   }
-  if (b.type === 'tool_use') {
-    return {
-      ...common,
-      kind: 'tool',
-      label: `${prefix}${b.name}`,
-      preview: argPreview(b.input),
-      weight: JSON.stringify(b.input ?? {}).length,
-      fields: argFields(b.input),
-    }
-  }
-  return {
-    ...common,
-    kind: 'meta',
-    label: `${prefix}${humanize(String(b.type ?? 'block'))}`,
-    preview: oneLine(JSON.stringify(b)),
-    weight: 1,
-    fields: valueFields('Block', b),
-  }
+  return { type: 'message', text: String(block.text ?? JSON.stringify(block)), at: when, raw: block }
 }
 
-const secs = (ms: number) => `${(Math.max(0, ms) / 1000).toFixed(1)}s`
+const toUsage = (u: Rec = {}): Usage => ({
+  input: u.input_tokens ?? 0,
+  output: u.output_tokens ?? 0,
+  cacheRead: u.cache_read_input_tokens ?? 0,
+  cacheWrite: u.cache_creation_input_tokens ?? 0,
+  reasoning: u.output_tokens_details?.thinking_tokens ?? 0,
+  costUsd: 0,
+})
 
 const humanize = (s: string) => s.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 
-const fact = (rows: (string | undefined)[][]): Fact[] =>
+const facts = (rows: (string | undefined)[][]): Fact[] =>
   rows.filter((r) => r[1]).map(([label, value]) => ({ label: label as string, value: String(value) }))
 
 function attachmentPreview(a: Rec): string {
@@ -279,3 +159,8 @@ function attachmentPreview(a: Rec): string {
   if (typeof a.text === 'string') return oneLine(a.text)
   return oneLine(JSON.stringify(a))
 }
+
+const systemPreview = (r: Rec): string =>
+  r.subtype === 'turn_duration'
+    ? `Turn completed in ${(r.durationMs / 1000).toFixed(1)}s across ${r.messageCount} messages`
+    : oneLine(JSON.stringify(r))

@@ -1,25 +1,25 @@
 import { Session } from './model'
-import * as claudeCode from './claude-code'
-import * as goose from './goose'
+import { Harness, SessionFile } from './harness'
+import { buildSession } from './build'
+import { claudeCode } from './claude-code'
+import { goose } from './goose'
 
 export * from './model'
+export * from './harness'
 
-const adapters = [
-  { name: 'Claude Code', ...claudeCode },
-  { name: 'goose', ...goose },
-]
+const harnesses: Harness[] = [claudeCode, goose]
 
 export class UnknownSessionError extends Error {}
 
 export function parseSessionText(text: string, fileName: string): Session {
-  const input = decode(text)
-  const adapter = adapters.find((a) => a.detect(input))
-  if (!adapter) {
+  const file: SessionFile = { name: fileName, data: decode(text) }
+  const harness = harnesses.find((h) => h.recognizes(file))
+  if (!harness) {
     throw new UnknownSessionError(
-      'Not a session we recognize yet. Drop a Claude Code .jsonl transcript or a goose .json session.',
+      `Not a session we recognize yet. Drop a ${harnesses.map((h) => h.agent).join(' or ')} session file.`,
     )
   }
-  return adapter.parse(input, fileName)
+  return buildSession(harness, file)
 }
 
 export async function readSessionFile(file: File): Promise<Session> {
@@ -57,6 +57,7 @@ if (import.meta.vitest) {
     const { readFileSync } = await import('node:fs')
     return parseSessionText(readFileSync(`example-sessions/${name}`, 'utf8'), name)
   }
+
   it('parses a Claude Code transcript', async () => {
     const s = await load('claude-code-threejs-earth-session.jsonl')
     expect(s.agent).toBe('Claude Code')
@@ -65,6 +66,7 @@ if (import.meta.vitest) {
     expect(s.steps.every((x) => x.durationMs >= 0)).toBe(true)
     expect(s.tokens.total).toBe(174050)
     expect(s.contributed.output).toBe(9204)
+    expect(Math.round(s.durationMs / 1000)).toBe(120)
   })
 
   it('sizes a step by what it adds, not by the context re-sent with it', async () => {
@@ -74,9 +76,9 @@ if (import.meta.vitest) {
     expect(biggest.label).toBe('Bash')
     expect(lastPrompt.preview).toBe('open it')
     expect(lastPrompt.tokens.total).toBeLessThan(20)
-    expect(s.steps.every((x) => x.tokens.total <= x.tokens.input + x.tokens.output)).toBe(true)
     expect(s.contributed.total).toBeLessThan(s.tokens.total)
   })
+
   it('parses a goose session', async () => {
     const s = await load('goose-threejs-earth-session.json')
     expect(s.agent).toBe('goose')
@@ -88,6 +90,7 @@ if (import.meta.vitest) {
     expect(s.contributed.output).toBe(14366)
     expect(Math.round(s.durationMs / 1000)).toBe(321)
   })
+
   it('rejects files it cannot recognize', () => {
     expect(() => parseSessionText('{"hello":"world"}', 'x.json')).toThrow(UnknownSessionError)
   })

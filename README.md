@@ -27,18 +27,37 @@ with Three.js") run through each agent, so the two shapes are directly comparabl
 
 ## Adding an agent
 
-Everything downstream of parsing works against one shape, so a new agent only has to
-produce it. Write a module in `src/session/` exporting:
+A harness describes its own format and nothing else. Implement `Harness` from
+`src/session/harness.ts` — three methods — and add it to the list in
+`src/session/index.ts`:
 
 ```ts
-export function detect(input: unknown): boolean
-export function parse(input: unknown, fileName: string): Session
+export const myAgent: Harness = {
+  agent: 'My Agent',
+  recognizes(file) { ... },   // is this file ours?
+  summarize(file) { ... },    // title, model, working directory, span, facts
+  timeline(file) { ... },     // everything that happened, oldest first
+}
 ```
 
-and add it to the `adapters` list in `src/session/index.ts`. `input` is already decoded
-from JSON or JSONL. `src/session/model.ts` carries the shared primitives an adapter
-needs — most importantly `allocateTokens` and `spanBlocks`, which split one model
-response's usage and wall-clock time across the content blocks it produced.
+`timeline` returns `SessionEvent[]`, a small union that says what happened without
+saying how to draw it:
+
+| Event | Means |
+| --- | --- |
+| `prompt` | A person typed something. The gap before it is reported as idle. |
+| `response` | One model response, or the part of one that arrived before a tool ran. Carries its blocks (`thinking`, `message`, `call`), its `usage`, and a `requestId` so blocks split across several responses are billed once. |
+| `result` | What a tool returned, matched to its `call` by id. |
+| `note` | Everything else: injected context, attachments, harness events. |
+
+`buildSession` in `src/session/build.ts` turns that stream into the `Session` the
+interface reads, and every harness gets the same treatment for free: block timings,
+token attribution, tool call/result pairing, idle gaps, session totals, and field
+rendering. A harness never builds a `Step`.
+
+Two optional fields exist for things only a harness can know: `Response.startedAt`,
+when the format records how long generation took, and `Response.sidechain`, when the
+work belongs to a subagent.
 
 ## How the numbers are worked out
 
