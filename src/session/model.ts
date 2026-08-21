@@ -42,11 +42,12 @@ export interface Session {
   id: string
   title: string
   agent: string
-  // TODO: a session can switch models mid-conversation (/model, a fallback after an
-  // overload, a subagent on another model). This collapses to the last model seen, so
-  // the switch is invisible. Detect changes per step and surface each one as its own
-  // event in the history, then let this field describe the range rather than a single
-  // value. Step.model already records the model per step, so the data is there.
+  // NOTE: A session can switch models mid-conversation (eg /model in claude)
+  // TODO: A thing I would do beyond today would be to look whether harnesses store model change events in
+  // in a uniform enough way in their session/conversation data models to track them and make Step.model
+  // meaningful. This would also be important if we want to add cost attribution per step, but there are
+  // other things to that as well. Keeping a simple representation at the Session level of last model seen
+  // for display at the top for now.
   model: string
   cwd: string
   startedAt: number
