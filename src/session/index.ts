@@ -91,6 +91,42 @@ if (import.meta.vitest) {
     expect(Math.round(s.durationMs / 1000)).toBe(321)
   })
 
+  it('survives records that break the usual shape', () => {
+    const usage = { input_tokens: 2, output_tokens: 10, cache_read_input_tokens: 10, cache_creation_input_tokens: 1000 }
+    const base = { sessionId: 's', cwd: '/w', isSidechain: false }
+    const jsonl = [
+      { ...base, type: 'user', timestamp: '2026-01-01T00:00:00.000Z', message: { content: 'hi' }, origin: { kind: 'human' } },
+      { ...base, uuid: 'u1', type: 'assistant', timestamp: '2026-01-01T00:00:01.000Z', message: { model: 'x', content: 'API Error: 500', usage } },
+      { ...base, uuid: 'u2', type: 'assistant', timestamp: '2026-01-01T00:00:02.000Z', message: { model: 'x', content: [], usage } },
+      { ...base, uuid: 'u3', type: 'assistant', timestamp: '2026-01-01T00:00:03.000Z', message: { id: 'r', model: 'x', content: [{ type: 'tool_use', id: 't', name: 'Bash', input: { command: 'ls' } }], usage } },
+      { ...base, type: 'user', timestamp: '2026-01-01T00:00:04.000Z', message: { content: [null, { type: 'tool_result', tool_use_id: 't', content: 'ok' }, { type: 'text', text: 'note' }] } },
+    ]
+    const s = parseSessionText(jsonl.map((r) => JSON.stringify(r)).join('\n'), 'edge.jsonl')
+
+    expect(s.steps.map((x) => x.label)).toEqual(['Prompt', 'Assistant', 'Bash', 'User context'])
+    expect(s.steps[1]!.preview).toBe('API Error: 500')
+    expect(s.tokens.total).toBe(1022 * 3)
+    expect(s.steps.every((x) => x.durationMs >= 0)).toBe(true)
+  })
+
+  it('does not let a message without a timestamp stretch the timeline', () => {
+    const s = parseSessionText(
+      JSON.stringify({
+        id: 'g',
+        working_dir: '/w',
+        name: 'n',
+        created_at: '2026-01-01T00:00:00Z',
+        updated_at: '2026-01-01T00:05:00Z',
+        conversation: [
+          { id: 'u', role: 'user', created: 1767225600, content: [{ type: 'text', text: 'hi' }], metadata: {} },
+          { id: 'a', role: 'assistant', content: [{ type: 'text', text: 'undated' }], metadata: {} },
+        ],
+      }),
+      'g.json',
+    )
+    expect(s.steps.every((x) => x.start >= s.startedAt && x.durationMs <= s.durationMs)).toBe(true)
+  })
+
   it('rejects files it cannot recognize', () => {
     expect(() => parseSessionText('{"hello":"world"}', 'x.json')).toThrow(UnknownSessionError)
   })

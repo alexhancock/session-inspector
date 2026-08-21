@@ -5,14 +5,16 @@ import {
   DraftStep,
   RequestMark,
   Session,
+  Tokens,
+  addTokens,
   allocateTokens,
   attributeInput,
   contextOf,
+  noTokens,
   finalizeSteps,
   idleDraft,
   oneLine,
   spanBlocks,
-  sumRequests,
   sumTokens,
   toDraft,
   tokensOf,
@@ -33,14 +35,13 @@ export function buildSession(harness: Harness, file: SessionFile): Session {
   const pending = new Map<string, DraftStep>()
   const marks: RequestMark[] = []
   const marked = new Set<string>()
-  const allocations = allocate(events, blocksOf)
+  const billing = bill(events, blocksOf)
   let cursor = summary.startedAt
 
   events.forEach((event, i) => {
-    const at = event.at
+    const at = Math.max(event.at, summary.startedAt)
     if (event.type === 'response') {
       const blocks = blocksOf.get(i) ?? []
-      if (!blocks.length) return
       const end = Math.max(cursor, at)
       const start = event.startedAt
         ? Math.min(Math.max(event.startedAt, cursor), end)
@@ -49,12 +50,12 @@ export function buildSession(harness: Harness, file: SessionFile): Session {
       const key = requestKey(event, i)
       if (!marked.has(key)) {
         marked.add(key)
-        const charged = allocations.get(blocks[0]!.id)?.request
+        const charged = billing.request(key)
         if (charged) marks.push({ at: start, context: contextOf(charged), output: charged.output })
       }
       spanBlocks(blocks, start, end).forEach((span, k) => {
         const block = blocks[k]!
-        const step = toDraft(block, span, allocations.get(block.id))
+        const step = toDraft(block, span, billing.of(block.id))
         drafts.push(step)
         const source = event.blocks[k]
         if (source?.type === 'call') pending.set(source.id, step)
@@ -109,7 +110,7 @@ export function buildSession(harness: Harness, file: SessionFile): Session {
       id: String(i),
       kind: 'meta',
       label: event.label,
-      preview: event.preview ?? oneLine(event.context ?? JSON.stringify(event.detail)),
+      preview: event.preview ?? oneLine(event.context ?? JSON.stringify(event.detail ?? null)),
       start: Math.min(cursor, at),
       end: at,
       injectedChars: event.context?.length ?? 0,
@@ -126,16 +127,23 @@ export function buildSession(harness: Harness, file: SessionFile): Session {
     agent: harness.agent,
     durationMs: summary.endedAt - summary.startedAt,
     steps,
-    tokens: sumRequests(steps),
+    tokens: billing.charged,
     contributed: sumTokens(steps),
-    costUsd: steps.reduce((total, step) => total + step.costUsd, 0),
+    costUsd: billing.costUsd,
     fileName: file.name,
   }
 }
 
 const requestKey = (event: SessionEvent & { type: 'response' }, index: number) => event.requestId ?? `#${index}`
 
-function allocate(events: SessionEvent[], blocksOf: Map<number, BlockDraft[]>): Map<string, Allocation> {
+interface Billing {
+  of(blockId: string): Allocation | undefined
+  request(key: string): Tokens | undefined
+  charged: Tokens
+  costUsd: number
+}
+
+function bill(events: SessionEvent[], blocksOf: Map<number, BlockDraft[]>): Billing {
   const requests = new Map<string, { blocks: BlockDraft[]; usage?: Usage }>()
   events.forEach((event, i) => {
     if (event.type !== 'response') return
@@ -145,16 +153,29 @@ function allocate(events: SessionEvent[], blocksOf: Map<number, BlockDraft[]>): 
     entry.usage = entry.usage ?? event.usage
     requests.set(key, entry)
   })
+
   const allocations = new Map<string, Allocation>()
-  requests.forEach(({ blocks, usage }) => {
-    if (!usage || !blocks.length) return
-    allocateTokens(blocks, {
-      tokens: tokensOf(usage),
-      thinkingTokens: usage.reasoning,
-      costUsd: usage.costUsd,
-    }).forEach((allocation, i) => allocations.set(blocks[i]!.id, allocation))
+  const charged = new Map<string, Tokens>()
+  let total = noTokens()
+  let costUsd = 0
+  requests.forEach(({ blocks, usage }, key) => {
+    if (!usage) return
+    const tokens = tokensOf(usage)
+    charged.set(key, tokens)
+    total = addTokens(total, tokens)
+    costUsd += usage.costUsd
+    if (!blocks.length) return
+    allocateTokens(blocks, { tokens, thinkingTokens: usage.reasoning, costUsd: usage.costUsd }).forEach(
+      (allocation, i) => allocations.set(blocks[i]!.id, allocation),
+    )
   })
-  return allocations
+
+  return {
+    of: (blockId) => allocations.get(blockId),
+    request: (key) => charged.get(key),
+    charged: total,
+    costUsd,
+  }
 }
 
 function blockDraft(block: ResponseBlock, id: string, response: SessionEvent & { type: 'response' }): BlockDraft {

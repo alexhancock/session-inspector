@@ -16,6 +16,13 @@ const ordered = (file: SessionFile): Rec[] =>
 
 const records = (file: SessionFile): Rec[] => (file.data as Rec[]).filter((r) => r && typeof r === 'object')
 
+const contentBlocks = (content: unknown): Rec[] =>
+  Array.isArray(content)
+    ? content.filter((b): b is Rec => Boolean(b) && typeof b === 'object')
+    : typeof content === 'string' && content
+      ? [{ type: 'text', text: content }]
+      : []
+
 export const claudeCode: Harness = {
   agent: 'Claude Code',
 
@@ -30,7 +37,7 @@ export const claudeCode: Harness = {
     const events = ordered(file)
     const first = events[0] ?? {}
     const last = events[events.length - 1] ?? first
-    const meta = (type: string) => records(file).find((r) => r.type === type) ?? {}
+    const meta = (type: string) => [...records(file)].reverse().find((r) => r.type === type) ?? {}
     const prompt = events.find((r) => r.type === 'user' && typeof r.message?.content === 'string')
     const model = [...events].reverse().find((r) => r.message?.model)?.message.model ?? 'unknown'
 
@@ -66,17 +73,22 @@ export const claudeCode: Harness = {
         const requestId = record.message?.id
         const blocks: ResponseBlock[] = []
         let end = when
-        while (i < events.length && events[i]!.type === 'assistant' && events[i]!.message?.id === requestId) {
+        do {
           const part = events[i] as Rec
           end = at(part)
-          for (const block of part.message?.content ?? []) blocks.push(toBlock(block, end))
+          for (const block of contentBlocks(part.message?.content)) blocks.push(toBlock(block, end))
           i++
-        }
+        } while (
+          requestId != null &&
+          i < events.length &&
+          events[i]!.type === 'assistant' &&
+          events[i]!.message?.id === requestId
+        )
         out.push({
           type: 'response',
           at: end,
           blocks,
-          requestId: String(requestId ?? when),
+          requestId: String(requestId ?? record.uuid ?? when),
           model: record.message?.model,
           usage: toUsage(record.message?.usage),
           sidechain: Boolean(record.isSidechain),
@@ -86,21 +98,20 @@ export const claudeCode: Harness = {
       }
 
       if (record.type === 'user') {
-        const content = record.message?.content
-        const results = (Array.isArray(content) ? content : []).filter((b: Rec) => b.type === 'tool_result')
-        if (results.length) {
-          for (const result of results) {
-            out.push({
-              type: 'result',
-              at: when,
-              callId: result.tool_use_id,
-              text: textOf(result.content),
-              failed: Boolean(result.is_error),
-              raw: result,
-            })
-          }
-        } else {
-          const text = textOf(content)
+        const parts = contentBlocks(record.message?.content)
+        for (const result of parts.filter((b) => b.type === 'tool_result')) {
+          out.push({
+            type: 'result',
+            at: when,
+            callId: result.tool_use_id,
+            text: textOf(result.content),
+            failed: Boolean(result.is_error),
+            raw: result,
+          })
+        }
+        const rest = parts.filter((b) => b.type !== 'tool_result')
+        if (rest.length) {
+          const text = textOf(rest)
           const typed = record.origin?.kind === 'human' || record.promptSource === 'typed'
           out.push(
             typed

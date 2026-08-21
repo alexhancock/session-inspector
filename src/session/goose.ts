@@ -7,7 +7,7 @@ type Rec = Record<string, any>
 const messages = (file: SessionFile): Rec[] =>
   ((file.data as Rec).conversation as Rec[]).filter((m) => m && Array.isArray(m.content))
 
-const at = (m: Rec): number => (m.created ?? 0) * 1000
+const at = (m: Rec): number => (Number.isFinite(m.created) ? m.created : 0) * 1000
 
 export const goose: Harness = {
   agent: 'goose',

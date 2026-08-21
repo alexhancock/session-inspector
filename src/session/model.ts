@@ -263,16 +263,19 @@ function spanEnds(blocks: BlockDraft[], start: number, end: number): number[] {
     }
     let j = i
     while (j < blocks.length && blocks[j]!.end == null) j++
-    const boundary = Math.max(prev, j < blocks.length ? (blocks[j]!.end as number) : end)
+    const timed = j < blocks.length
+    const boundary = Math.max(prev, timed ? (blocks[j]!.end as number) : end)
+    const run = blocks.slice(i, timed ? j + 1 : j)
     let acc = prev
     share(
       boundary - prev,
-      blocks.slice(i, j).map((b) => Math.max(1, b.weight)),
+      run.map((b) => Math.max(1, b.weight)),
     ).forEach((slice, k) => {
+      if (i + k >= j) return
       acc += slice
       ends[i + k] = acc
     })
-    prev = boundary
+    prev = acc
     i = j
   }
   return ends
@@ -305,6 +308,13 @@ if (import.meta.vitest) {
     expect(spanBlocks([block('a', 1), block('b', 3)], 0, 100)).toEqual([
       { start: 0, end: 25 },
       { start: 25, end: 100 },
+    ])
+  })
+
+  it('leaves a timed block room when the blocks before it carry no timestamps', () => {
+    expect(spanBlocks([block('a', 1), { ...block('b', 1), end: 100 }], 0, 200)).toEqual([
+      { start: 0, end: 50 },
+      { start: 50, end: 100 },
     ])
   })
 }
