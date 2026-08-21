@@ -56,9 +56,9 @@ export function Inspector({ session, onReset }: { session: Session; onReset: () 
           Session<em>Inspector</em>
         </span>
         <span className="badge solid label">{session.agent}</span>
-        <span className="session-title">{session.title}</span>
-        <span className="badge mono" style={{ fontSize: 11 }} title={session.fileName}>
-          {session.model}
+        <span className="model mono">{session.model}</span>
+        <span className="session-title" title={session.fileName}>
+          {session.title}
         </span>
         <button type="button" className="close" onClick={onReset}>
           New session

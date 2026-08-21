@@ -42,6 +42,11 @@ export interface Session {
   id: string
   title: string
   agent: string
+  // TODO: a session can switch models mid-conversation (/model, a fallback after an
+  // overload, a subagent on another model). This collapses to the last model seen, so
+  // the switch is invisible. Detect changes per step and surface each one as its own
+  // event in the history, then let this field describe the range rather than a single
+  // value. Step.model already records the model per step, so the data is there.
   model: string
   cwd: string
   startedAt: number

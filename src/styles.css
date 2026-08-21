@@ -364,6 +364,12 @@ button {
   color: var(--red);
 }
 
+.model {
+  font-size: 11px;
+  color: var(--mute);
+  white-space: nowrap;
+}
+
 .session-title {
   font-size: 17px;
   letter-spacing: -0.02em;
@@ -846,7 +852,7 @@ button {
     font-size: 15px;
   }
 
-  .top .badge.mono,
+  .top .model,
   .stat-note {
     display: none;
   }
