@@ -16,7 +16,7 @@ const DEMOS: Demo[] = [
   {
     id: 'goose',
     agent: 'goose',
-    name: 'ThreeJS earth',
+    name: 'Spinning earth',
     fileName: 'goose-threejs-earth-session.json',
     text: gooseText,
   },

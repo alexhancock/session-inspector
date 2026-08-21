@@ -82,7 +82,7 @@ if (import.meta.vitest) {
   it('parses a goose session', async () => {
     const s = await load('goose-threejs-earth-session.json')
     expect(s.agent).toBe('goose')
-    expect(s.title).toBe('ThreeJS spinning Earth')
+    expect(s.title).toBe('Spinning earth')
     expect(s.steps.filter((x) => x.kind === 'tool').length).toBe(14)
     expect(s.steps.every((x) => x.durationMs >= 0)).toBe(true)
     expect(Math.round(s.costUsd * 100) / 100).toBe(0.65)
