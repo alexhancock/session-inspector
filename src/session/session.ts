@@ -688,7 +688,7 @@ if (import.meta.vitest) {
     const usage = { input_tokens: 2, output_tokens: 10, cache_read_input_tokens: 10, cache_creation_input_tokens: 1000 }
     const base = { sessionId: 's', cwd: '/w', isSidechain: false }
     const jsonl = [
-      { ...base, type: 'user', timestamp: '2026-01-01T00:00:00.000Z', message: { content: 'hi' }, origin: { kind: 'human' } },
+      { ...base, type: 'user', timestamp: '2026-01-01T00:00:00.000Z', message: { content: 'hi' }, promptSource: 'sdk' },
       { ...base, uuid: 'u1', type: 'assistant', timestamp: '2026-01-01T00:00:01.000Z', message: { model: 'x', content: 'API Error: 500', usage } },
       { ...base, uuid: 'u2', type: 'assistant', timestamp: '2026-01-01T00:00:02.000Z', message: { model: 'x', content: [], usage } },
       { ...base, uuid: 'u3', type: 'assistant', timestamp: '2026-01-01T00:00:03.000Z', message: { id: 'r', model: 'x', content: [{ type: 'tool_use', id: 't', name: 'Bash', input: { command: 'ls' } }], usage } },
@@ -704,6 +704,7 @@ if (import.meta.vitest) {
       'User context',
     ])
     expect(s.steps.find((x) => x.label === 'Assistant')!.preview).toBe('API Error: 500')
+    expect(s.steps.find((x) => x.type === 'prompt')!.preview).toBe('hi')
     expect(s.tokens.total).toBe(1022 * 3)
     expect(s.steps.every((x) => x.durationMs >= 0)).toBe(true)
   })

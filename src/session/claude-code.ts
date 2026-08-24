@@ -137,7 +137,7 @@ export const claudeCode: Harness = {
         const rest = parts.filter((b) => b.type !== 'tool_result')
         if (rest.length) {
           const text = textOf(rest)
-          const typed = record.origin?.kind === 'human' || record.promptSource === 'typed'
+          const typed = record.origin?.kind === 'human' || typeof record.promptSource === 'string'
           out.push(
             typed
               ? { type: 'prompt', at: when, text, raw: record }
