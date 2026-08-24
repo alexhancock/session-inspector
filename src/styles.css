@@ -322,8 +322,8 @@ button {
 
 .app {
   height: 100%;
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   background: var(--paper);
   overflow-x: hidden;
 }
@@ -344,6 +344,10 @@ button {
   white-space: nowrap;
 }
 
+.wordmark:hover em {
+  color: var(--ink);
+}
+
 .wordmark em {
   font-style: normal;
   color: var(--red);
@@ -355,13 +359,25 @@ button {
   white-space: nowrap;
 }
 
+.session-name {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex: 1;
+  min-width: 0;
+}
+
+.session-name .label {
+  flex: none;
+  white-space: nowrap;
+}
+
 .session-title {
   font-size: 17px;
   letter-spacing: -0.02em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
   min-width: 0;
 }
 
@@ -374,6 +390,29 @@ button {
 .badge.solid {
   background: var(--ink);
   color: var(--card);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  border-bottom: 1.5px solid var(--ink);
+  background: var(--card);
+}
+
+.fact {
+  padding: 9px 16px 11px;
+  border-left: 1px solid var(--hair);
+  min-width: 0;
+}
+
+.fact:first-child {
+  border-left: 0;
+}
+
+.fact-value {
+  font-size: 12px;
+  margin-top: 3px;
+  word-break: break-word;
 }
 
 .stats {
@@ -410,11 +449,8 @@ button {
   margin-top: 3px;
 }
 
-.stat.accent .stat-value {
-  color: var(--red);
-}
-
 .body {
+  flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   min-height: 0;
@@ -522,7 +558,7 @@ button {
   font-family: var(--mono);
 }
 
-.row-kind {
+.row-type {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -578,15 +614,47 @@ button {
   font-weight: 500;
 }
 
-.row.err .row-label::after {
-  content: 'ERR';
+.row.err {
+  background: var(--red);
+  color: var(--card);
+}
+
+.row.err:hover,
+.row.err.hot {
+  background: #d5341f;
+}
+
+.row.err::before,
+.row.err:hover::before,
+.row.err.hot::before {
+  background: var(--ink);
+}
+
+.row.err .row-index,
+.row.err .row-preview {
+  color: rgba(251, 251, 246, 0.75);
+}
+
+.row.err .chip,
+.row.err .meter i {
+  background: var(--card) !important;
+}
+
+.row.err .meter {
+  background: rgba(251, 251, 246, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(251, 251, 246, 0.45);
+}
+
+.row.err .row-label::after,
+.detail-top.err h2::after {
+  content: 'ERROR';
   font-family: var(--mono);
   font-size: 9px;
-  color: var(--card);
-  background: var(--red);
+  color: var(--red);
+  background: var(--card);
   padding: 1px 4px;
   margin-left: 7px;
-  vertical-align: 1px;
+  vertical-align: 2px;
 }
 
 .row.dim .row-label,
@@ -689,6 +757,40 @@ button {
   padding: 12px 12px 12px 20px;
   border-bottom: 1.5px solid var(--ink);
   background: var(--card);
+}
+
+.detail-top.err {
+  background: var(--red);
+  color: var(--card);
+}
+
+.detail-top.err .detail-sub {
+  color: rgba(251, 251, 246, 0.8);
+}
+
+.detail-top.err .chip {
+  background: var(--card) !important;
+}
+
+.detail-top.err .nav button {
+  border-color: var(--card);
+}
+
+.detail-top.err .nav button:hover:not(:disabled) {
+  background: var(--card);
+  color: var(--red);
+}
+
+.detail-top.err .dismiss {
+  background: var(--card);
+  border-color: var(--card);
+  color: var(--red);
+}
+
+.detail-top.err .dismiss:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--card);
 }
 
 .detail-top h2 {
@@ -843,9 +945,12 @@ button {
     gap: 10px 12px;
   }
 
-  .session-title {
+  .session-name {
     order: 3;
     flex-basis: 100%;
+  }
+
+  .session-title {
     font-size: 15px;
   }
 

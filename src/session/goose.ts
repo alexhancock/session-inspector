@@ -1,6 +1,4 @@
-import { Fact } from './model'
-import { Harness, ResponseBlock, SessionEvent, SessionFile, Summary, Usage } from './harness'
-import { textOf } from './render'
+import { Fact, Harness, ResponseBlock, SessionEvent, SessionFile, Summary, Usage, textOf } from './harness'
 
 type Rec = Record<string, any>
 
@@ -34,8 +32,6 @@ export const goose: Harness = {
       startedAt,
       endedAt: Math.max(Date.parse(d.updated_at) || 0, startedAt),
       facts: facts([
-        ['Agent', 'goose'],
-        ['Model', model],
         ['Provider', d.provider_name],
         ['Working directory', d.working_dir],
         ['Mode', d.goose_mode],

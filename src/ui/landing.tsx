@@ -75,13 +75,15 @@ export function Landing({ demos, error, busy, onFiles, onDemo }: Props) {
             <em>Inspector</em>
           </h1>
           <span className="label masthead-note">
-            Drop in a session
+            Drop in a session file
             <br />
-            to see where the time
+            from your coding agent
             <br />
-            and tokens went,
+            to get a detailed view
             <br />
-            then open any step
+            of where the time
+            <br />
+            and tokens went
           </span>
         </div>
 

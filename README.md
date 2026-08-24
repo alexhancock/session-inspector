@@ -29,7 +29,7 @@ with Three.js") run through each agent, so the two shapes are directly comparabl
 
 A harness describes its own format and nothing else. Implement `Harness` from
 `src/session/harness.ts` — three methods — and add it to the list in
-`src/session/index.ts`:
+`src/session/session.ts`:
 
 ```ts
 export const myAgent: Harness = {
@@ -50,10 +50,18 @@ saying how to draw it:
 | `result` | What a tool returned, matched to its `call` by id. |
 | `note` | Everything else: injected context, attachments, harness events. |
 
-`buildSession` in `src/session/build.ts` turns that stream into the `Session` the
-interface reads, and every harness gets the same treatment for free: block timings,
-token attribution, tool call/result pairing, idle gaps, session totals, and field
-rendering. A harness never builds a `Step`.
+The split between the two methods is the split between what a session *is* and what
+*happened in it*. Configuration a harness records as a record — Claude Code writes auto
+mode as an attachment — belongs in `summarize`'s `facts`, shown in the top bar. Only
+things that occupied time or context belong in `timeline`.
+
+`src/session/session.ts` turns that stream into the `Session` the interface reads, and
+every harness gets the same treatment for free: block timings, token attribution, tool
+call/result pairing, idle gaps, session totals, and field rendering. A harness never
+builds a `Step`. That file is the whole of session handling — reconstruction, token
+accounting, estimation, field rendering — behind six exports: `Session`, `Step`,
+`StepType`, `parseSessionText`, `readSessionFile`, and `UnknownSessionError`. Nothing
+else about how a session is put together is visible to the interface.
 
 Two optional fields exist for things only a harness can know: `Response.startedAt`,
 when the format records how long generation took, and `Response.sidechain`, when the
@@ -79,7 +87,7 @@ reconstructed. The rules:
   context (a prompt's text, a tool result, an attachment).
   - Output is exact, split across a response's blocks by size, with reasoning tokens
     going to thinking blocks.
-  - Input is estimated by `src/session/estimate.ts`, then calibrated against how much
+  - Input is estimated from text length, then calibrated against how much
     the measured context actually grew between consecutive requests. If the measured
     growth is smaller than the estimate, the estimate scales down; if it's larger, the
     excess (the system prompt and tool definitions, which no step represents) is left
@@ -93,13 +101,14 @@ reconstructed. The rules:
     on the same gaps (21% median, mean 0.84) while adding 449 KB gzipped to a 115 KB
     bundle. It measures the text precisely but still misses the per-message framing —
     role tokens, content-block JSON, tool-result wrappers — that the divisor absorbs.
-    Anthropic also documents that OpenAI tokenizers are simply wrong for Claude. Swap
-    the estimator in that one file if a harness ever needs something better.
+    Anthropic also documents that OpenAI tokenizers are simply wrong for Claude. It
+    lives behind one function, `estimateTokens`, if it ever needs to be swapped.
 - **The billed totals are still reported, at the session level.** The stat band shows
-  `Conversation` (the sum of contributions) next to `Charged` (what the requests
-  actually cost, cache included), and a step's detail shows both. The two demo sessions
-  charge 174,050 and 306,659 tokens — matching their own files — while contributing
-  about 13k and 18k.
+  `Conversation` (the whole conversation counted once — the sum of every step's
+  contribution) next to `Consumed` (what it cost to send that conversation once per
+  request, cache included). A step's detail reports only its own contribution. The two
+  demo sessions consume 174,050 and 306,659 tokens — matching their own files — while
+  the conversations themselves are about 15k and 20k.
 
 - **Gaps before a human prompt become explicit `Waiting for you` steps**, so idle time is
   visible instead of inflating whatever ran last.

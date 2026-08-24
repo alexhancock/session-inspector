@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Step } from '../session'
+import { Step } from '../session/session'
 import { compact, duration } from '../format'
-import { KIND_COLOR, onDark } from './palette'
+import { TYPE_COLOR, onDark } from './palette'
 
 interface Rect {
   x: number
@@ -93,8 +93,8 @@ export function Treemap({ steps, metric, width, height, hovered, onHover, onOpen
     <svg width={width} height={height} role="list" onMouseLeave={() => onHover(null)}>
       {tiles.map((t) => {
         const active = hovered === t.item.id || focus === t.item.id
-        const fill = KIND_COLOR[t.item.kind]
-        const text = onDark(t.item.kind) ? '#fbfbf6' : '#121212'
+        const fill = TYPE_COLOR[t.item.type]
+        const text = onDark(t.item.type) ? '#fbfbf6' : '#121212'
         const room = t.w > 62 && t.h > 26
         return (
           <g

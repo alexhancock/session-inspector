@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Session, UnknownSessionError, parseSessionText, readSessionFile } from './session'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Session, UnknownSessionError, parseSessionText, readSessionFile } from './session/session'
 import { Landing, Demo } from './ui/landing'
 import { Inspector } from './ui/inspector'
 import gooseText from '../example-sessions/goose-threejs-earth-session.json?raw'
@@ -18,14 +18,16 @@ export function App() {
   const [session, setSession] = useState<Session | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const opened = useRef<Session | null>(null)
 
   useEffect(() => {
-    const onPop = () => setSession(null)
+    const onPop = () => setSession(inspecting() ? opened.current : null)
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [])
 
   const show = useCallback((next: Session) => {
+    opened.current = next
     setSession(next)
     setError(null)
     if (inspecting()) window.history.replaceState(INSPECTING, '')

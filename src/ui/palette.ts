@@ -1,6 +1,6 @@
-import { StepKind } from '../session'
+import { StepType } from '../session/session'
 
-export const KIND_COLOR: Record<StepKind, string> = {
+export const TYPE_COLOR: Record<StepType, string> = {
   tool: '#f0402c',
   thinking: '#1b7fd0',
   response: '#121212',
@@ -9,7 +9,7 @@ export const KIND_COLOR: Record<StepKind, string> = {
   meta: '#dcdbcd',
 }
 
-export const KIND_NAME: Record<StepKind, string> = {
+export const TYPE_NAME: Record<StepType, string> = {
   tool: 'Tool call',
   thinking: 'Thinking',
   response: 'Assistant',
@@ -18,6 +18,6 @@ export const KIND_NAME: Record<StepKind, string> = {
   meta: 'System',
 }
 
-export const KIND_ORDER: StepKind[] = ['prompt', 'thinking', 'response', 'tool', 'idle', 'meta']
+export const TYPE_ORDER: StepType[] = ['prompt', 'thinking', 'response', 'tool', 'idle', 'meta']
 
-export const onDark = (kind: StepKind): boolean => kind === 'response' || kind === 'tool' || kind === 'thinking'
+export const onDark = (type: StepType): boolean => type === 'response' || type === 'tool' || type === 'thinking'

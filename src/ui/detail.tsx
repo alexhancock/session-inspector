@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
-import { Session, Step } from '../session'
+import { Session, Step } from '../session/session'
 import { clock, compact, count, cost, duration, offset } from '../format'
-import { KIND_COLOR, KIND_NAME } from './palette'
+import { TYPE_COLOR, TYPE_NAME } from './palette'
 
 interface Props {
   session: Session
@@ -24,18 +24,13 @@ export function Detail({ session, step, hasPrev, hasNext, onMove, onClose }: Pro
   }, [onClose, onMove, hasPrev, hasNext])
 
   const t = step.tokens
-  const r = step.request
+  const share = (part: number, whole: number) => `${((part / Math.max(1, whole)) * 100).toFixed(1)}% of session`
   const meta: [string, string][] = [
-    ['Kind', KIND_NAME[step.kind]],
+    ['Type', TYPE_NAME[step.type]],
     ['Step', `${step.index + 1} of ${session.steps.length}`],
     ['Started', `${clock(step.start)} · ${offset(step.start - session.startedAt)} in`],
-    ['Duration', duration(step.durationMs)],
-    ['Share of session', `${((step.durationMs / Math.max(1, session.durationMs)) * 100).toFixed(1)}%`],
-    ['Contributed', t.total ? count(t.total) : '—'],
-    ['Added to context', t.input ? count(t.input) : '—'],
-    ['Generated', t.output ? count(t.output) : '—'],
-    ['Charged on this request', r ? count(r.total) : '—'],
-    ['Read from cache', r?.cacheRead ? count(r.cacheRead) : '—'],
+    ['Duration', `${duration(step.durationMs)} · ${share(step.durationMs, session.durationMs)}`],
+    ['Tokens', t.total ? `${count(t.total)} · ${share(t.total, session.contributed.total)}` : '—'],
     ['Cost', step.costUsd ? cost(step.costUsd) : '—'],
     ['Model', step.model ?? session.model],
   ]
@@ -49,8 +44,8 @@ export function Detail({ session, step, hasPrev, hasNext, onMove, onClose }: Pro
         aria-label={`${step.label} detail`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="detail-top">
-          <span className="chip" style={{ background: KIND_COLOR[step.kind] }} aria-hidden />
+        <div className={`detail-top${step.isError ? ' err' : ''}`}>
+          <span className="chip" style={{ background: TYPE_COLOR[step.type] }} aria-hidden />
           <h2>{step.label}</h2>
           <span className="mono detail-sub">
             {compact(step.tokens.total)} tok · {duration(step.durationMs)}

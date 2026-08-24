@@ -1,5 +1,3 @@
-import { Fact } from './model'
-
 /** A decoded session file: `data` is the parsed JSON value, or an array of JSONL records. */
 export interface SessionFile {
   readonly name: string
@@ -71,6 +69,12 @@ export interface Note extends Occurred {
 
 export type SessionEvent = Prompt | Response | Result | Note
 
+/** One labelled property of the session, listed in the top bar. */
+export interface Fact {
+  label: string
+  value: string
+}
+
 /** What the interface shows about the session as a whole. */
 export interface Summary {
   id: string
@@ -95,4 +99,27 @@ export interface Harness {
   summarize(file: SessionFile): Summary
   /** Everything that happened, oldest first. */
   timeline(file: SessionFile): SessionEvent[]
+}
+
+/** Collapse whitespace and cut to one readable line, for previews and titles. */
+export const oneLine = (s: string, max = 140): string => {
+  const flat = s.replace(/\s+/g, ' ').trim()
+  return flat.length > max ? flat.slice(0, max - 1) + '…' : flat
+}
+
+/** Read the text out of whatever shape a record stores it in. */
+export function textOf(content: unknown): string {
+  if (typeof content === 'string') return content
+  if (Array.isArray(content)) {
+    return content
+      .map((b) => {
+        if (typeof b === 'string') return b
+        const rec = b as Record<string, unknown>
+        if (typeof rec.text === 'string') return rec.text
+        return JSON.stringify(b)
+      })
+      .join('\n')
+  }
+  if (content && typeof content === 'object') return JSON.stringify(content, null, 2)
+  return content == null ? '' : String(content)
 }

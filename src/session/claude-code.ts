@@ -1,7 +1,4 @@
-import { Fact } from './model'
-import { Harness, ResponseBlock, SessionEvent, SessionFile, Summary, Usage } from './harness'
-import { oneLine } from './model'
-import { textOf } from './render'
+import { Fact, Harness, ResponseBlock, SessionEvent, SessionFile, Summary, Usage, oneLine, textOf } from './harness'
 
 type Rec = Record<string, any>
 
@@ -15,6 +12,33 @@ const ordered = (file: SessionFile): Rec[] =>
     .sort((a, b) => at(a) - at(b))
 
 const records = (file: SessionFile): Rec[] => (file.data as Rec[]).filter((r) => r && typeof r === 'object')
+
+const omit = (rec: Rec, keys: string[]): Rec =>
+  Object.fromEntries(Object.entries(rec).filter(([k]) => !keys.includes(k)))
+
+const ENVELOPE = [
+  'parentUuid',
+  'uuid',
+  'leafUuid',
+  'type',
+  'subtype',
+  'timestamp',
+  'isSidechain',
+  'isMeta',
+  'userType',
+  'entrypoint',
+  'cwd',
+  'sessionId',
+  'version',
+  'gitBranch',
+]
+
+const AUTO_MODE = [
+  ['bashFirst', 'bash first'],
+  ['steerOnly', 'steer only'],
+  ['bypass', 'bypass permissions'],
+  ['autoModeConsentFlow', 'consent flow'],
+]
 
 const contentBlocks = (content: unknown): Rec[] =>
   Array.isArray(content)
@@ -38,6 +62,8 @@ export const claudeCode: Harness = {
     const first = events[0] ?? {}
     const last = events[events.length - 1] ?? first
     const meta = (type: string) => [...records(file)].reverse().find((r) => r.type === type) ?? {}
+    const attached = (type: string) =>
+      [...records(file)].reverse().find((r) => r.attachment?.type === type)?.attachment
     const prompt = events.find((r) => r.type === 'user' && typeof r.message?.content === 'string')
     const model = [...events].reverse().find((r) => r.message?.model)?.message.model ?? 'unknown'
 
@@ -49,12 +75,11 @@ export const claudeCode: Harness = {
       startedAt: events.length ? at(first) : Date.now(),
       endedAt: events.length ? at(last) : Date.now(),
       facts: facts([
-        ['Agent', 'Claude Code'],
-        ['Model', model],
         ['Working directory', first.cwd],
         ['Git branch', first.gitBranch],
         ['Version', first.version],
         ['Permission mode', meta('permission-mode').permissionMode],
+        ['Auto mode', autoMode(attached('auto_mode'))],
         ['Session ID', first.sessionId],
       ]),
     }
@@ -124,11 +149,15 @@ export const claudeCode: Harness = {
       }
 
       const attachment = record.attachment
+      if (attachment?.type === 'auto_mode') {
+        i++
+        continue
+      }
       out.push({
         type: 'note',
         at: when,
         label: humanize(attachment ? (attachment.type ?? 'attachment') : (record.subtype ?? 'system')),
-        detail: attachment ?? record,
+        detail: attachment ? omit(attachment, ['type']) : omit(record, ENVELOPE),
         context: attachment ? JSON.stringify(attachment) : undefined,
         preview: attachment ? attachmentPreview(attachment) : systemPreview(record),
         raw: record,
@@ -158,6 +187,12 @@ const toUsage = (u: Rec = {}): Usage => ({
   reasoning: u.output_tokens_details?.thinking_tokens ?? 0,
   costUsd: 0,
 })
+
+function autoMode(a: Rec | undefined): string | undefined {
+  if (!a) return undefined
+  const on = AUTO_MODE.filter(([key]) => a[key as string]).map(([, name]) => name)
+  return on.length ? `On · ${on.join(' · ')}` : 'On'
+}
 
 const humanize = (s: string) => s.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 
