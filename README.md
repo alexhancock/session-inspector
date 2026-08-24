@@ -89,10 +89,14 @@ reconstructed. The rules:
     going to thinking blocks.
   - Input is estimated from text length, then calibrated against how much
     the measured context actually grew between consecutive requests. If the measured
-    growth is smaller than the estimate, the estimate scales down; if it's larger, the
-    excess (the system prompt and tool definitions, which no step represents) is left
-    unattributed rather than inflating a step. Where an agent's own numbers make the
-    growth unusable, the estimate stands on its own.
+    growth is smaller than the estimate, the estimate scales down. Where an agent's own
+    numbers make the growth unusable, the estimate stands on its own.
+  - Growth that no step explains is not silently dropped, and never inflated onto a
+    step that didn't cause it. It is collected into one `System prompt and tools` step
+    at the head of the session, which is what it is: the preamble and tool schemas every
+    request carries. On the Claude Code demo that is 20,728 tokens — **58% of the whole
+    conversation, before anyone typed anything.** Hiding it made the session look four
+    times smaller than it was.
 
     The estimator is one line — characters ÷ 2.5 — and that divisor is measured, not
     guessed. Against the 11 request gaps in the demo sessions where the transcripts
@@ -106,9 +110,16 @@ reconstructed. The rules:
 - **The billed totals are still reported, at the session level.** The stat band shows
   `Conversation` (the whole conversation counted once — the sum of every step's
   contribution) next to `Consumed` (what it cost to send that conversation once per
-  request, cache included). A step's detail reports only its own contribution. The two
-  demo sessions consume 174,050 and 306,659 tokens — matching their own files — while
-  the conversations themselves are about 15k and 20k.
+  request, cache included). A step's detail reports only its own contribution.
+
+  The two reconcile, which is the point of counting this way. Claude Code's demo carries
+  35,597 tokens of conversation and consumes 174,050 across 5 requests — 4.9x, because
+  each request re-sends what came before. Every step's contribution sums back to that
+  35,597, which is exactly the context its last request carried plus that request's own
+  output — measured, not estimated. goose's demo sums to 27,117 against a last-request
+  context of 26,111: 6 of its 17 requests record a context smaller than the previous
+  request's own output, so no growth can be measured there and the estimate stands. Both
+  reconciliations are pinned by tests.
 
 - **Gaps before a human prompt become explicit `Waiting for you` steps**, so idle time is
   visible instead of inflating whatever ran last.

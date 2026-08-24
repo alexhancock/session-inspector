@@ -231,7 +231,10 @@ function build(harness: Harness, file: SessionFile): Session {
   })
 
   extendLast(drafts, summary.endedAt)
-  const steps = attributeInput(finalizeSteps(drafts, summary.endedAt), marks)
+  const steps = finalizeSteps(drafts, summary.endedAt)
+  const baseline = attributeInput(steps, marks)
+  if (baseline > 0) steps.unshift(baselineStep(summary.startedAt, baseline))
+  steps.forEach((step, i) => (step.index = i))
   return {
     ...summary,
     agent: harness.agent,
@@ -491,7 +494,7 @@ function allocateTokens(blocks: BlockDraft[], charge: Charge): Allocation[] {
   }))
 }
 
-function attributeInput(steps: Step[], requests: RequestMark[]): Step[] {
+function attributeInput(steps: Step[], requests: RequestMark[]): number {
   const marks = [...requests].sort((a, b) => a.at - b.at)
   const groups = new Map<number, Step[]>()
   for (const step of steps) {
@@ -500,18 +503,52 @@ function attributeInput(steps: Step[], requests: RequestMark[]): Step[] {
     if (index < 0) continue
     groups.set(index, [...(groups.get(index) ?? []), step])
   }
-  groups.forEach((members, index) => {
-    const mark = marks[index] as RequestMark
+
+  let unexplained = 0
+  marks.forEach((mark, index) => {
     const previous = marks[index - 1]
     const budget = Math.max(0, mark.context - (previous ? previous.context + previous.output : 0))
+    const members = groups.get(index) ?? []
     const estimates = members.map((s) => s.injectedTokens)
     const estimated = estimates.reduce((a, b) => a + b, 0)
-    const scale = budget > 0 ? Math.min(1, budget / estimated) : 1
+    const scale = budget > 0 && estimated > 0 ? Math.min(1, budget / estimated) : 1
+    let attributed = 0
     members.forEach((step, i) => {
-      step.tokens = tokensOf({ input: Math.round((estimates[i] as number) * scale), output: step.tokens.output })
+      const input = Math.round((estimates[i] as number) * scale)
+      attributed += input
+      step.tokens = tokensOf({ input, output: step.tokens.output })
     })
+    unexplained += Math.max(0, budget - attributed)
   })
-  return steps
+  return unexplained
+}
+
+function baselineStep(at: number, tokens: number): Step {
+  return {
+    id: 'baseline',
+    index: 0,
+    type: 'meta',
+    label: 'System prompt and tools',
+    preview: 'Context carried by every request that no step accounts for',
+    start: at,
+    end: at,
+    durationMs: 0,
+    tokens: tokensOf({ input: tokens }),
+    injectedTokens: tokens,
+    costUsd: 0,
+    isError: false,
+    fields: [
+      {
+        label: 'What this is',
+        value:
+          'Every request carries a system prompt and the definitions of the tools the agent can call. ' +
+          'None of it appears in the transcript as something that happened, but all of it occupies context. ' +
+          'This is the part of the context each request carried that its recorded steps do not explain.',
+        format: 'text',
+      },
+    ],
+    raw: null,
+  }
 }
 
 const CHARS_PER_TOKEN = 2.5
@@ -615,12 +652,30 @@ if (import.meta.vitest) {
 
   it('sizes a step by what it adds, not by the context re-sent with it', async () => {
     const s = await load('claude-code-threejs-earth-session.jsonl')
-    const biggest = [...s.steps].sort((a, b) => b.tokens.total - a.tokens.total)[0]!
+    const ranked = [...s.steps].sort((a, b) => b.tokens.total - a.tokens.total)
     const lastPrompt = s.steps.filter((x) => x.type === 'prompt').at(-1)!
-    expect(biggest.label).toBe('Bash')
+    expect(ranked[0]!.label).toBe('System prompt and tools')
+    expect(ranked.find((x) => x.id !== 'baseline')!.label).toBe('Bash')
     expect(lastPrompt.preview).toBe('open it')
     expect(lastPrompt.tokens.total).toBeLessThan(20)
     expect(s.contributed.total).toBeLessThan(s.tokens.total)
+  })
+
+  it('counts the conversation as the context the requests actually carried', async () => {
+    const carried = (s: Session) => {
+      const last = s.steps.filter((x) => x.request).at(-1)!.request!
+      return contextOf(last) + last.output
+    }
+
+    const cc = await load('claude-code-threejs-earth-session.jsonl')
+    expect(carried(cc)).toBe(35597)
+    expect(cc.contributed.total).toBe(35597)
+    expect(cc.steps.find((x) => x.id === 'baseline')!.tokens.input).toBe(20728)
+
+    const g = await load('goose-threejs-earth-session.json')
+    expect(carried(g)).toBe(26111)
+    expect(g.contributed.total).toBe(27117)
+    expect(g.contributed.total / carried(g)).toBeLessThan(1.05)
   })
 
   it('reports configuration as a session fact rather than a step', async () => {
@@ -641,8 +696,14 @@ if (import.meta.vitest) {
     ]
     const s = parseSessionText(jsonl.map((r) => JSON.stringify(r)).join('\n'), 'edge.jsonl')
 
-    expect(s.steps.map((x) => x.label)).toEqual(['Prompt', 'Assistant', 'Bash', 'User context'])
-    expect(s.steps[1]!.preview).toBe('API Error: 500')
+    expect(s.steps.map((x) => x.label)).toEqual([
+      'System prompt and tools',
+      'Prompt',
+      'Assistant',
+      'Bash',
+      'User context',
+    ])
+    expect(s.steps.find((x) => x.label === 'Assistant')!.preview).toBe('API Error: 500')
     expect(s.tokens.total).toBe(1022 * 3)
     expect(s.steps.every((x) => x.durationMs >= 0)).toBe(true)
   })
@@ -707,6 +768,10 @@ if (import.meta.vitest) {
     const unmeasured = step(10, 1000)
     attributeInput([unmeasured], [{ at: 10, context: 0, output: 0 }])
     expect(unmeasured.tokens.input).toBe(1000)
+
+    const lone = step(10, 100)
+    expect(attributeInput([lone], [{ at: 10, context: 26000, output: 0 }])).toBe(25900)
+    expect(lone.tokens.input).toBe(100)
   })
 
   it('previews the most meaningful argument and flattens nested ones', () => {
